@@ -1,0 +1,4 @@
+env/
+venv/
+config/config.py
+.DS_Store
