@@ -134,9 +134,8 @@ def show_annotation_page():
 def push_annotations_to_database(annotations_df):
     # get the username and current timestamp
     user_id = st.session_state.username
-    current_timestamp = time.strftime('%Y-%m-%d %H:%M:%S')  # Generates timestamp
+    current_timestamp = time.strftime('%Y-%m-%d %H:%M:%S')  
 
-    # Database connection
     conn = init_connection()
     if conn is None:
         st.error("Database connection failed.")
@@ -144,6 +143,19 @@ def push_annotations_to_database(annotations_df):
 
     try:
         with conn.cursor() as cur:
+            # get analystID based on user_id
+            cur.execute("""
+                SELECT "analystID" FROM tbl_analyst WHERE "username" = %s;
+            """, (user_id,))
+            analyst_row = cur.fetchone()
+            
+            if analyst_row is None:
+                st.error("Analyst ID not found for the current user.")
+                return
+            
+            analyst_id = analyst_row[0]
+
+            # insert a new golden version
             cur.execute(
                 """
                 INSERT INTO tbl_versiongolden ("goldenVersion")
@@ -189,16 +201,17 @@ def push_annotations_to_database(annotations_df):
                 ON CONFLICT DO NOTHING;
                 """)
 
-                # insert esci label IDs paired with qpID into tbl_golden
+                # insert esci label IDs paired with qpID and analystID into tbl_golden
                 tmp_cur.execute("""
                 WITH latest_golden AS (
                    SELECT MAX("goldenID") AS "goldenID" FROM tbl_versiongolden
                 )
-                INSERT INTO tbl_golden ("qpID", "esciID", "goldenID")
+                INSERT INTO tbl_golden ("qpID", "esciID", "goldenID", "analystID")
                 SELECT DISTINCT ON (qp."qpID", lg."goldenID")
                    qp."qpID", 
                    e."esciID",
-                   lg."goldenID"
+                   lg."goldenID",
+                   %s  -- Adding analystID here
                 FROM tmp_import t
                 JOIN tbl_queryproducts qp 
                    ON t."query" = qp."query" AND t."product_title" = qp."product"
@@ -207,8 +220,9 @@ def push_annotations_to_database(annotations_df):
                 CROSS JOIN latest_golden lg
                 ON CONFLICT ("qpID", "goldenID") 
                 DO UPDATE SET 
-                   "esciID" = EXCLUDED."esciID";
-                """)
+                   "esciID" = EXCLUDED."esciID",
+                   "analystID" = EXCLUDED."analystID";
+                """, (analyst_id,))
 
                 conn.commit()
                 st.success("Annotations successfully pushed to database!")
