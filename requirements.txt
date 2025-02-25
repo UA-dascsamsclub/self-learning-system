@@ -89,3 +89,8 @@ urllib3==2.2.3
 wcwidth==0.2.13
 widgetsnbextension==4.0.13
 zipp==3.20.2
+psycopg2==2.9.10
+psycopg2-binary==2.9.10
+bcrypt==4.2.1
+streamlit==1.42.0
+streamlit-authenticator==0.4.1
