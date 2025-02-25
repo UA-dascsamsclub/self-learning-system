@@ -111,6 +111,9 @@ class BiEncoderWithClassifier(PreTrainedModel):
 
         return model
 
+
+#For testing the model, you can run the following code snippet:
+'''
 if __name__ == "__main__":
     # test
     model = BiEncoderWithClassifier()
@@ -119,3 +122,4 @@ if __name__ == "__main__":
 
     logits = model(queries, products)
     print("\nLogits for Query-Product Pairs:\n", logits)
+    '''
