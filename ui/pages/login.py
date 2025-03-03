@@ -1,13 +1,8 @@
 import streamlit as st
-from utils.database import authenticate_user, init_connection
+from utils.database import authenticate_user
 
 def show_login_page():
-    conn = init_connection()
 
-    if conn is None:
-        st.error("Database connection failed")
-        return
-    
     st.title("Login to Start Annotating")
 
     with st.form("login_form"):
