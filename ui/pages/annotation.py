@@ -177,7 +177,7 @@ def push_annotations_to_database(annotations_df):
             
             # convert the rows into tuples for SQL execution
             annotations_tuples = [
-                (row["query"], row["product_title"], row["annotated_label"], row["confidenceScore"])
+                (row["query"], row["product_title"], row["annotated_label"])
                 for _, row in annotations_df.iterrows()
             ]
 
@@ -187,14 +187,13 @@ def push_annotations_to_database(annotations_df):
                 CREATE TEMP TABLE tmp_import (
                     "query" TEXT, 
                     "product_title" TEXT, 
-                    "esci_label" TEXT,
-                    "confidenceScore" FLOAT
+                    "esci_label" TEXT
                 ) ON COMMIT DROP;
                 """)
                 
                 psycopg2.extras.execute_values(
                     tmp_cur,
-                    """INSERT INTO tmp_import ("query", "product_title", "esci_label", "confidenceScore") 
+                    """INSERT INTO tmp_import ("query", "product_title", "esci_label") 
                        VALUES %s""",
                     annotations_tuples
                 )
@@ -230,20 +229,6 @@ def push_annotations_to_database(annotations_df):
                    "analystID" = EXCLUDED."analystID";
                 """, (analyst_id,))
                 
-                tmp_cur.execute("""
-                INSERT INTO tbl_predictions ("qpID", "esciID", "confidenceScore")
-                SELECT DISTINCT qp."qpID", e."esciID", t."confidenceScore"
-                FROM tmp_import t
-                JOIN tbl_queryproducts qp 
-                ON t."query" = qp."query" AND t."product_title" = qp."product"
-                JOIN tbl_esci e 
-                ON t."esci_label" = e."esciLabel"
-                ON CONFLICT ("qpID") 
-                DO UPDATE SET 
-                "esciID" = EXCLUDED."esciID",
-                "confidenceScore" = EXCLUDED."confidenceScore";
-                """)
-
                 conn.commit()
                 st.success("Annotations successfully pushed to database!")
 
@@ -258,8 +243,7 @@ def save_annotation(row, label, confidence):
         'query': row['query'],
         'product_title': row['product'],
         'original_label': label,
-        'annotated_label': label,
-        'confidenceScore': confidence,
+        'annotated_label': label
     }
 
     st.session_state.annotation_history.append(new_annotation)
