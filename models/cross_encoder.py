@@ -12,7 +12,7 @@ def assign_esci_label(score):
     else:
         return 'I'
 
-def generate_esci_labels(model_path, limit=100):
+def generate_esci_labels(model_path, limit=1000):
     """Generates ESCI labels for query-product pairs using the cross-encoder model."""
     df = fetch_query_product_pairs(limit)
     if df is None or df.empty:

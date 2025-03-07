@@ -15,7 +15,12 @@ def connect_to_db():
 def fetch_query_product_pairs(limit=1000):
     query = f"""
     SELECT query, product
-    FROM tbl_queryproducts
+    FROM tbl_queryproducts qp
+    WHERE NOT EXISTS (
+    SELECT
+    FROM tbl_predictions
+    WHERE "qpID" = qp."qpID"
+    )
     LIMIT {limit}
     """
 
