@@ -1,6 +1,6 @@
 import psycopg2
 import pandas as pd
-from db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+from database.db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
 def connect_to_db():
     """Establishes a connection to the PostgreSQL database."""
@@ -29,7 +29,7 @@ def fetch_query_product_pairs(limit=1000):
         print(f"Error fetching data: {e}")
         return None
     
-if __name__ == "__main__":
-    df = fetch_query_product_pairs()
-    if df is not None:
-        print(df.head())
+# if __name__ == "__main__":
+#     df = fetch_query_product_pairs()
+#     if df is not None:
+#         print(df.head())

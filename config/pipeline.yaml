@@ -1,0 +1,8 @@
+pipeline:
+  model:
+    type: "crossencoder"
+    path: "/Users/sarahlawlis/Desktop/repos/self-learning-system/models/model_ce"
+  
+  logging:
+    level: "INFO"
+    log_file: "logs/pipeline.log"

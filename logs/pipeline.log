@@ -1,0 +1,115 @@
+2025-03-07 08:28:17,714 - INFO - Pipeline triggered.
+2025-03-07 08:28:17,714 - INFO - Fetching query-product pairs from database.
+2025-03-07 08:28:17,837 - INFO - Fetched 1000 query-product pairs.
+2025-03-07 08:28:17,837 - INFO - Running inference.
+2025-03-07 08:28:18,097 - INFO - Use pytorch device: mps
+2025-03-07 08:28:18,845 - INFO - Inference complete.
+2025-03-07 08:28:18,849 - INFO - Pipeline completed successfully.
+2025-03-07 08:35:09,748 - INFO - Logging initialized.
+2025-03-07 08:35:09,749 - INFO - Pipeline triggered.
+2025-03-07 08:35:09,749 - INFO - Fetching query-product pairs from database.
+2025-03-07 08:35:09,851 - INFO - Fetched 1000 query-product pairs.
+2025-03-07 08:35:09,851 - INFO - Running inference.
+2025-03-07 08:35:10,105 - INFO - Use pytorch device: mps
+2025-03-07 08:35:10,885 - INFO - Inference complete.
+2025-03-07 08:35:10,891 - INFO - Pipeline completed successfully.
+2025-03-07 09:30:00,558 - INFO - Logging initialized.
+2025-03-07 09:30:00,558 - INFO - Pipeline triggered.
+2025-03-07 09:30:00,558 - INFO - Fetching query-product pairs from database.
+2025-03-07 09:30:00,683 - INFO - Fetched 1000 query-product pairs.
+2025-03-07 09:30:00,683 - INFO - Running inference.
+2025-03-07 09:30:00,937 - INFO - Use pytorch device: mps
+2025-03-07 09:30:01,708 - INFO - Inference complete.
+2025-03-07 09:30:01,712 - INFO - Pipeline completed successfully.
+2025-03-07 09:53:14,603 - INFO - Logging initialized.
+2025-03-07 09:53:14,603 - INFO - Pipeline triggered.
+2025-03-07 09:53:14,603 - INFO - Fetching query-product pairs from database.
+2025-03-07 09:53:14,749 - INFO - Fetched 1000 query-product pairs.
+2025-03-07 09:53:14,749 - INFO - Running inference.
+2025-03-07 09:53:15,022 - INFO - Use pytorch device: mps
+2025-03-07 09:53:15,816 - INFO - Inference complete.
+2025-03-07 09:53:15,820 - INFO - Pipeline completed successfully.
+2025-03-07 10:02:32,202 - INFO - Logging initialized.
+2025-03-07 10:02:32,202 - INFO - Pipeline triggered.
+2025-03-07 10:02:32,202 - INFO - Fetching query-product pairs from database.
+2025-03-07 10:02:32,310 - INFO - Fetched 1000 query-product pairs.
+2025-03-07 10:02:32,310 - INFO - Running inference using model cross-encoder.
+2025-03-07 10:02:32,566 - INFO - Use pytorch device: mps
+2025-03-07 10:02:33,289 - INFO - Inference complete.
+2025-03-07 10:02:33,289 - INFO - Storing predictions in database.
+2025-03-07 10:02:33,429 - INFO - Pipeline completed successfully.
+2025-03-07 10:07:31,415 - INFO - Logging initialized.
+2025-03-07 10:07:31,416 - INFO - Pipeline triggered.
+2025-03-07 10:07:31,416 - INFO - Fetching query-product pairs from database.
+2025-03-07 10:07:31,530 - INFO - Fetched 1000 query-product pairs.
+2025-03-07 10:07:31,530 - INFO - Running inference using model cross-encoder.
+2025-03-07 10:07:31,784 - INFO - Use pytorch device: mps
+2025-03-07 10:07:32,444 - INFO - Inference complete.
+2025-03-07 10:07:32,444 - INFO - Storing predictions in database.
+2025-03-07 10:07:32,616 - INFO - Pipeline completed successfully.
+2025-03-07 10:08:36,845 - INFO - Logging initialized.
+2025-03-07 10:08:36,845 - INFO - Pipeline triggered.
+2025-03-07 10:08:36,845 - INFO - Fetching query-product pairs from database.
+2025-03-07 10:08:36,950 - INFO - Fetched 1000 query-product pairs.
+2025-03-07 10:08:36,950 - INFO - Running inference using model crossencoder.
+2025-03-07 10:08:37,191 - INFO - Use pytorch device: mps
+2025-03-07 10:08:37,796 - INFO - Inference complete.
+2025-03-07 10:08:37,796 - INFO - Storing predictions in database.
+2025-03-07 10:12:58,446 - INFO - Logging initialized.
+2025-03-07 10:12:58,447 - INFO - Pipeline triggered.
+2025-03-07 10:12:58,447 - INFO - Fetching query-product pairs from database.
+2025-03-07 10:12:58,555 - INFO - Fetched 1000 query-product pairs.
+2025-03-07 10:12:58,555 - INFO - Running inference using model crossencoder.
+2025-03-07 10:12:58,817 - INFO - Use pytorch device: mps
+2025-03-07 10:12:59,643 - INFO - Inference complete.
+2025-03-07 10:12:59,643 - INFO - Storing predictions in database.
+2025-03-07 10:13:38,068 - INFO - Logging initialized.
+2025-03-07 10:13:38,069 - INFO - Pipeline triggered.
+2025-03-07 10:13:38,069 - INFO - Fetching query-product pairs from database.
+2025-03-07 10:13:38,180 - INFO - Fetched 1000 query-product pairs.
+2025-03-07 10:13:38,180 - INFO - Running inference using model crossencoder.
+2025-03-07 10:13:38,414 - INFO - Use pytorch device: mps
+2025-03-07 10:13:39,135 - INFO - Inference complete.
+2025-03-07 10:13:39,135 - INFO - Storing predictions in database.
+2025-03-07 10:14:00,341 - INFO - Logging initialized.
+2025-03-07 10:14:00,341 - INFO - Pipeline triggered.
+2025-03-07 10:14:00,341 - INFO - Fetching query-product pairs from database.
+2025-03-07 10:14:00,460 - INFO - Fetched 1000 query-product pairs.
+2025-03-07 10:14:00,460 - INFO - Running inference using model crossencoder.
+2025-03-07 10:14:00,686 - INFO - Use pytorch device: mps
+2025-03-07 10:14:01,176 - INFO - Inference complete.
+2025-03-07 10:14:01,177 - INFO - Storing predictions in database.
+2025-03-07 10:14:07,289 - INFO - Pipeline completed successfully.
+2025-03-07 10:52:17,496 - INFO - Logging initialized.
+2025-03-07 10:52:17,497 - INFO - Pipeline triggered.
+2025-03-07 10:52:17,497 - INFO - Fetching query-product pairs from database.
+2025-03-07 10:52:18,736 - INFO - Fetched 1000 query-product pairs.
+2025-03-07 10:52:18,736 - INFO - Running inference using model crossencoder.
+2025-03-07 10:52:19,543 - INFO - Use pytorch device: mps
+2025-03-07 10:52:20,250 - INFO - Inference complete.
+2025-03-07 10:52:20,250 - INFO - Storing predictions in database.
+2025-03-07 10:54:29,853 - INFO - Pipeline completed successfully.
+2025-03-07 11:04:16,710 - INFO - Logging initialized.
+2025-03-07 11:04:16,711 - INFO - Pipeline triggered.
+2025-03-07 11:04:16,711 - INFO - Fetching query-product pairs from database.
+2025-03-07 11:04:17,781 - INFO - Fetched 1000 query-product pairs.
+2025-03-07 11:04:17,782 - INFO - Running inference using model crossencoder.
+2025-03-07 11:04:18,638 - INFO - Use pytorch device: mps
+2025-03-07 11:04:19,364 - INFO - Inference complete.
+2025-03-07 11:04:19,364 - INFO - Storing predictions in database.
+2025-03-07 11:05:42,548 - INFO - Logging initialized.
+2025-03-07 11:05:42,548 - INFO - Pipeline triggered.
+2025-03-07 11:05:42,548 - INFO - Fetching query-product pairs from database.
+2025-03-07 11:05:43,288 - INFO - Fetched 1000 query-product pairs.
+2025-03-07 11:05:43,288 - INFO - Running inference using model crossencoder.
+2025-03-07 11:05:43,976 - INFO - Use pytorch device: mps
+2025-03-07 11:05:44,481 - INFO - Inference complete.
+2025-03-07 11:05:44,481 - INFO - Storing predictions in database.
+2025-03-07 11:07:50,599 - INFO - Logging initialized.
+2025-03-07 11:07:50,599 - INFO - Pipeline triggered.
+2025-03-07 11:07:50,599 - INFO - Fetching query-product pairs from database.
+2025-03-07 11:07:51,342 - INFO - Fetched 1000 query-product pairs.
+2025-03-07 11:07:51,342 - INFO - Running inference using model crossencoder.
+2025-03-07 11:07:52,167 - INFO - Use pytorch device: mps
+2025-03-07 11:07:52,795 - INFO - Inference complete.
+2025-03-07 11:07:52,800 - INFO - Pipeline completed successfully.
