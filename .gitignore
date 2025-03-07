@@ -1,4 +1,11 @@
 env/
 venv/
 config/config.py
+<<<<<<< HEAD
 .DS_Store
+=======
+.DS_Store
+database/db_config.py
+models/db_config.py
+.streamlit/secrets.toml
+>>>>>>> 4c81faa57dcec9d433e1e850ea7144d5ad4aa6ba
