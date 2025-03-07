@@ -52,8 +52,8 @@ def main():
     logging.info("Inference complete.")
 
     # 3. store predictions to tbl_predictions
-    # logging.info("Storing predictions in database.")
-    # store_predictions_in_db(df_labeled, model_type)
+    logging.info("Storing predictions in database.")
+    store_predictions_in_db(df_labeled, model_type)
 
     # printing results for now until further steps completed
     if df_labeled is not None:

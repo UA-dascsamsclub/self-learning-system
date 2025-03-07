@@ -4,3 +4,4 @@ config/config.py
 .DS_Store
 database/db_config.py
 .streamlit/secrets.toml
+logs/

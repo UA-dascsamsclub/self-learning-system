@@ -4,13 +4,13 @@ from database.fetch_data import fetch_query_product_pairs
 def assign_esci_label(score):
     """Assigns ESCI labels based on the similarity score."""
     if score > 0.9:
-        return 'Exact'
+        return 'E'
     elif score > 0.7:
-        return 'Substitute'
+        return 'S'
     elif score > 0.5:
-        return 'Complement'
+        return 'C'
     else:
-        return 'Irrelevant'
+        return 'I'
 
 def generate_esci_labels(model_path, limit=100):
     """Generates ESCI labels for query-product pairs using the cross-encoder model."""
