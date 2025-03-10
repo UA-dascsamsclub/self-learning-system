@@ -31,15 +31,10 @@ def initialize_session():
     if st.session_state.df is None or st.session_state.df.empty:
         st.error("Failed to load data from the database.")
         return  
-
     if 'index' not in st.session_state:
         st.session_state.index = 0
     if 'annotations' not in st.session_state:
         st.session_state.annotations = []
-    #if 'percent_confident' not in st.session_state:
-    #    st.session_state.percent_confident = {}
-    #if 'model_prediction' not in st.session_state:
-    #    st.session_state.model_prediction = {}
     if 'page' not in st.session_state:
         st.session_state.page = 'login'
     if 'logged_in' not in st.session_state:
@@ -53,10 +48,24 @@ def initialize_session():
 
 def reset_session_variables():
     query = """
-        SELECT * FROM tbl_predictions AS qp
-        WHERE NOT EXISTS (
-            SELECT 1 FROM tbl_golden g WHERE g."qpID" = qp."qpID"
-        )
+        SELECT 
+            qp."qpID",
+            qp."confidenceScore",
+            qp."esciID",
+            qproduct.query,
+            qproduct.product
+        FROM 
+            tbl_predictions AS qp
+        JOIN 
+            tbl_queryproducts AS qproduct 
+        ON 
+            qp."qpID" = qproduct."qpID"
+        WHERE 
+            NOT EXISTS (
+                SELECT 1 
+                FROM tbl_golden g 
+                WHERE g."qpID" = qp."qpID"
+            )
         LIMIT 50;
     """  
     st.session_state.df = run_query(query)  
@@ -67,10 +76,6 @@ def reset_session_variables():
     
     st.session_state.index = 0
     st.session_state.annotations = []
-    st.session_state.percent_confident = {}
-    st.session_state.model_prediction = {}
     st.session_state.previous_index = None
     st.session_state.annotation_history = []
-
-    # force a refresh of the page
     st.rerun()
