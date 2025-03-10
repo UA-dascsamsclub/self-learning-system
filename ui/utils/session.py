@@ -4,11 +4,26 @@ from utils.database import run_query, init_connection
 
 def initialize_session():
     # loading 50 rows that are not already in the golden dataset
+    # selecting from the tbl_predictions table 
     query = """
-        SELECT * FROM tbl_queryproducts AS qp
-        WHERE NOT EXISTS (
-            SELECT 1 FROM tbl_golden g WHERE g."qpID" = qp."qpID"
-        )
+        SELECT 
+            qp."qpID",
+            qp."confidenceScore",
+            qp."esciID",
+            qproduct.query,
+            qproduct.product
+        FROM 
+            tbl_predictions AS qp
+        JOIN 
+            tbl_queryproducts AS qproduct 
+        ON 
+            qp."qpID" = qproduct."qpID"
+        WHERE 
+            NOT EXISTS (
+                SELECT 1 
+                FROM tbl_golden g 
+                WHERE g."qpID" = qp."qpID"
+            )
         LIMIT 50;
     """  
     st.session_state.df = run_query(query)  
@@ -21,10 +36,10 @@ def initialize_session():
         st.session_state.index = 0
     if 'annotations' not in st.session_state:
         st.session_state.annotations = []
-    if 'percent_confident' not in st.session_state:
-        st.session_state.percent_confident = {}
-    if 'model_prediction' not in st.session_state:
-        st.session_state.model_prediction = {}
+    #if 'percent_confident' not in st.session_state:
+    #    st.session_state.percent_confident = {}
+    #if 'model_prediction' not in st.session_state:
+    #    st.session_state.model_prediction = {}
     if 'page' not in st.session_state:
         st.session_state.page = 'login'
     if 'logged_in' not in st.session_state:
@@ -38,7 +53,7 @@ def initialize_session():
 
 def reset_session_variables():
     query = """
-        SELECT * FROM tbl_queryproducts AS qp
+        SELECT * FROM tbl_predictions AS qp
         WHERE NOT EXISTS (
             SELECT 1 FROM tbl_golden g WHERE g."qpID" = qp."qpID"
         )

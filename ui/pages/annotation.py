@@ -23,15 +23,14 @@ def show_annotation_page():
 
     if index < len(df):
         row = df.iloc[index]
+        percent_confident = row['confidenceScore'] * 100
+        esci_mapping = {0: 'E', 1: 'S', 2: 'C', 3: 'I'}
+        esci_label = esci_mapping.get(row['esciID'], 'Unknown')
     else:
         row = df.iloc[-1]
-
-    if index not in st.session_state.percent_confident:
-        st.session_state.percent_confident[index] = random.randint(0, 100)
-
-    percent_confident = st.session_state.percent_confident[index]
-
-    random_label = random.choice(["E", "S", "C", "I"])
+        percent_confident = row['confidenceScore'] * 100
+        esci_mapping = {0: 'E', 1: 'S', 2: 'C', 3: 'I'}
+        esci_label = esci_mapping.get(row['esciID'], 'Unknown')
 
     col1, col2 = st.columns([2, 1])
 
@@ -43,7 +42,7 @@ def show_annotation_page():
 
     with col2:
         st.write(f"#### **Current Label**: ")
-        st.markdown(f"<h2 style='text-align: center; color: black;'>{random_label}</h2>", unsafe_allow_html=True)
+        st.markdown(f"<h2 style='text-align: center; color: black;'>{esci_label}</h2>", unsafe_allow_html=True)
         st.write(f"#### **Confidence**: {percent_confident}%")
 
     st.write("---")
@@ -54,7 +53,7 @@ def show_annotation_page():
     if index < len(df):  
         
         if st.button("Confirm Current Label", key='confirm_current', use_container_width=True):
-            save_annotation(row, random_label, percent_confident)
+            save_annotation(row, esci_label, percent_confident)
 
         selected_label = st.selectbox(
             "Choose a new label:",
@@ -236,14 +235,13 @@ def push_annotations_to_database(annotations_df):
         st.error(f"Error inserting rows: {e}")
         conn.rollback()
 
-
 def save_annotation(row, label, confidence):
 
     new_annotation = {
         'query': row['query'],
         'product_title': row['product'],
-        'original_label': label,
-        'annotated_label': label
+        'original_label': row['esciID'],
+        'annotated_label': row['esciID']
     }
 
     st.session_state.annotation_history.append(new_annotation)
