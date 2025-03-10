@@ -5,18 +5,15 @@ import psycopg2.extras
 def add_users_to_database():
     # Connect to your database
     conn = psycopg2.connect(
-        host="insert host here",
-        database="insert database here",
-        user="insert personal username here",
-        password="insert personal password here"
+        host = "100.114.129.9", 
+        database = "dascsamsclub",
+        user = "cgcordes",
+        password = "Dascteam12"
     )
     cur = conn.cursor()
 
     users = [
-        ("insert-username", "insert-password"), 
-        ("insert-username", "insert-password"), 
-        ("insert-username", "insert-password"), 
-        ("insert-username", "insert-password")
+        ("sarah", "sarah-pass")
     ]
     try:
         for username, password in users:
