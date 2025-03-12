@@ -1,5 +1,6 @@
 from sentence_transformers import CrossEncoder
-model = CrossEncoder('/Users/sarahlawlis/Desktop/repos/self-learning-system/models/model_ce')
+model_path = "models/model_ce"
+model = CrossEncoder(model_path, num_labels=4, automodel_args={'ignore_mismatched_sizes': True})
 
 scores = model.predict([('carrots', 'Fresh-Cut Vegetable Tray and Ranch Dressing, priced per pound'), 
                         ('carrots', 'Sweet Potato & Carrot Recipe, Grain Free Dry Dog Food , 23.5 lbs.'), 

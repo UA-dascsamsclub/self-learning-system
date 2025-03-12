@@ -111,12 +111,11 @@ class BiEncoderWithClassifier(PreTrainedModel):
 
         return model
 
-
-#For testing the model, you can run the following code snippet:
 '''
+#For testing the model, you can run the following code snippet:
 if __name__ == "__main__":
-    # test
-    model = BiEncoderWithClassifier()
+    config = BiEncoderConfig(encoder_name="sentence-transformers/all-distilroberta-v1", num_classes=4, version="latest")
+    model = BiEncoderWithClassifier(config)
     queries = ["wireless headphones", "gaming laptop"]
     products = ["Bluetooth over-ear headphones", "High-performance gaming laptop"]
 
