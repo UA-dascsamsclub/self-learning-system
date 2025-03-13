@@ -102,13 +102,15 @@ def train_crossencoder(model, dataset, num_epochs=3, learning_rate=1e-5, batch_s
     print("CrossEncoder model saved in model_ce_trained/ directory!")
 
 if __name__ == "__main__":
-    # Placeholder data (Replace with actual data fetching)
-    data = {
-        "query": ["wireless headphones", "gaming laptop"],
-        "product_title": ["Bluetooth over-ear headphones", "High-performance gaming laptop"],
-        "encoded_labels": [0, 1]
-    }
-    df = pd.DataFrame(data)
+    # Load data from GitHub repo directly
+    csv_url = "https://raw.githubusercontent.com/sarahlawlis/esci-shopping-queries/main/data/df_golden.csv"    
+    try:
+        df = pd.read_csv(csv_url)
+        print(f"Loaded dataset with {len(df)} records.")
+
+    except Exception as e:
+        print(f"Failed to load CSV from {csv_url}: {e}")
+        exit(1)
 
     # Prepare data
     samples = prepare_data(df)
