@@ -88,20 +88,35 @@ def train_biencoder(model, dataloader, num_epochs=5, learning_rate=1e-4):
     print("Tokenizer saved in model_be/ directory!")
 
 if __name__ == "__main__":
-    # Placeholder data (Replace with actual data fetching)
-    queries = ["wireless headphones", "gaming laptop"]
-    products = ["Bluetooth over-ear headphones", "High-performance gaming laptop"]
-    labels = torch.tensor([0, 1])  # Replace with actual ESCI labels
+    import pandas as pd
     
+    # Load data from GitHub repo directly
+    csv_url = "https://raw.githubusercontent.com/sarahlawlis/esci-shopping-queries/main/data/df_golden.csv"    
+
+    try:
+        df = pd.read_csv(csv_url)
+        print(f"Loaded dataset with {len(df)} records.")
+    except Exception as e:
+        print(f"Failed to load CSV from {csv_url}: {e}")
+        exit(1)
+
+    # Extract queries, products, and labels
+    queries = df["query"].tolist()
+    products = df["product_title"].tolist()
+    labels = torch.tensor(df["encoded_labels"].tolist(), dtype=torch.long)
+
     # Initialize dataset and dataloader
     dataset = QueryProductDataset(queries, products, labels)
-    dataloader = DataLoader(dataset, batch_size=2, shuffle=True)
-    
+    dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
+
     # Create a config instance
     config = BiEncoderConfig()
-    
+
     # Initialize the model with the config
     model = BiEncoderWithClassifier(config)
-    
+
+    # Move model to GPU if available
+    model.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
+
     # Train the model
     train_biencoder(model, dataloader)
