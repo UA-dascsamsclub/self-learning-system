@@ -126,7 +126,8 @@ if __name__ == "__main__":
     )
 
     # Move model to GPU if available
-    model.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
+    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    print(f"Using device: {device}")
 
     # Train the model
     train_crossencoder(model, dataset)

@@ -1,4 +1,6 @@
 from sentence_transformers import CrossEncoder
+from database.fetch_data import fetch_query_product_pairs
+
 model_path = "models/model_ce"
 model = CrossEncoder(model_path, num_labels=4, automodel_args={'ignore_mismatched_sizes': True})
 
