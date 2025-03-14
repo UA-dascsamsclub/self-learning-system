@@ -1,14 +1,18 @@
 import os
 import pandas as pd
 from tqdm import tqdm
-import torch
 from sentence_transformers import CrossEncoder
 import sys
 sys.path.append('../self-learning-system')
 from database.fetch_data import fetch_query_product_pairs
+import torch.mps
+torch.mps.empty_cache()
+import datetime
+print("MPS Available:", torch.backends.mps.is_available())
+print("MPS Built:", torch.backends.mps.is_built())
 
 # Define model path once and reuse it
-model_dir = "models/model_ce_trained/"
+model_dir = "models/model_ce/"
 
 # Initialize the cross-encoder model
 model = CrossEncoder(
@@ -22,8 +26,8 @@ def predict_labels():
     Runs inference on query-product pairs pulled from the database using a sentence-transformers CrossEncoder.
     Returns a DataFrame with query, product, score, and esci_label columns.
     """
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
+    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    model.model.to(device)
 
     df = fetch_query_product_pairs(limit=1000)
 
@@ -62,9 +66,11 @@ def predict_labels():
 
     return result_df
 
-'''
+
 if __name__ == "__main__":
     predictions_df = predict_labels()
     print("Predictions DataFrame:")
     print(predictions_df.head())
-'''
+
+    time = datetime.datetime.now(datetime.timezone.utc) 
+    predictions_df.to_excel(f'/Users/sarahlawlis/Desktop/preds_{time}.xlsx')

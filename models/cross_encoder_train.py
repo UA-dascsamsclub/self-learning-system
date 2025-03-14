@@ -6,6 +6,10 @@ from torch.utils.data import Dataset, DataLoader
 from torch import nn
 from torch.optim import AdamW
 from tqdm import tqdm
+import torch.mps
+torch.mps.empty_cache()
+print("MPS Available:", torch.backends.mps.is_available())
+print("MPS Built:", torch.backends.mps.is_built())
 
 class QueryProductDataset(Dataset):
     def __init__(self, samples):
@@ -64,7 +68,7 @@ def train_crossencoder(model, dataset, num_epochs=3, learning_rate=1e-5, batch_s
         total_loss = 0
         for batch in tqdm(dataloader, desc=f"Epoch {epoch + 1}/{num_epochs}", unit="batch"):
             sentences = batch
-            labels = torch.tensor([sample.label for sample in batch], dtype=torch.long).to(model.device)
+            labels = torch.tensor([sample.label for sample in batch], dtype=torch.long).to(device)
 
             # Extract query and product from InputExample objects
             query = [sample.texts[0] for sample in sentences]  # First element of texts is the query
@@ -78,7 +82,7 @@ def train_crossencoder(model, dataset, num_epochs=3, learning_rate=1e-5, batch_s
                 padding=True,
                 max_length=128,
                 return_tensors="pt"
-            ).to(model.device)
+            ).to(device)
 
             # Forward pass to get logits
             outputs = model.model(**inputs)  # Accessing underlying model
@@ -103,15 +107,22 @@ def train_crossencoder(model, dataset, num_epochs=3, learning_rate=1e-5, batch_s
 
 if __name__ == "__main__":
     # Load data from GitHub repo directly
-    csv_url = "https://raw.githubusercontent.com/sarahlawlis/esci-shopping-queries/main/data/df_golden.csv"    
+    csv = '/Users/sarahlawlis/Documents/repos/self-learning-system/df_golden.csv'
     try:
-        df = pd.read_csv(csv_url)
+        df = pd.read_csv(csv)
         print(f"Loaded dataset with {len(df)} records.")
 
     except Exception as e:
-        print(f"Failed to load CSV from {csv_url}: {e}")
+        print(f"Failed to load CSV from {csv}: {e}")
         exit(1)
 
+    esci_mapping = {"E": 0, "S": 1, "C": 2, "I": 3}
+
+    df["encoded_labels"] = df["esci_label"].map(esci_mapping)
+
+    if df["encoded_labels"].isna().sum() > 0:
+        print("Warning: Some 'esci_label' values could not be mapped. Check for unexpected labels.")
+        df = df.dropna(subset=["encoded_labels"])
     # Prepare data
     samples = prepare_data(df)
 
