@@ -12,7 +12,7 @@ print("MPS Available:", torch.backends.mps.is_available())
 print("MPS Built:", torch.backends.mps.is_built())
 
 # Define model path once and reuse it
-model_dir = "models/model_ce/"
+model_dir = "models/model_ce_trained"
 
 # Initialize the cross-encoder model
 model = CrossEncoder(
