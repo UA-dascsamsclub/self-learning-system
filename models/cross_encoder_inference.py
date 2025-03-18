@@ -11,13 +11,8 @@ import datetime
 print("MPS Available:", torch.backends.mps.is_available())
 print("MPS Built:", torch.backends.mps.is_built())
 
-<<<<<<< HEAD
 # Define model path 
 model_dir = "models/model_ce_trained/"
-=======
-# Define model path once and reuse it
-model_dir = "models/model_ce_trained"
->>>>>>> 959a5693c8bcf752cd35d34fd60872d1a2ad4892
 
 # Initialize the cross-encoder model
 model = CrossEncoder(
@@ -68,7 +63,7 @@ def predict_labels():
 
     return result_df
 
-
+'''
 if __name__ == "__main__":
     predictions_df = predict_labels()
     print("Predictions DataFrame:")
@@ -76,3 +71,4 @@ if __name__ == "__main__":
 
     time = datetime.datetime.now(datetime.timezone.utc) 
     predictions_df.to_excel(f'/Users/sarahlawlis/Desktop/preds_{time}.xlsx')
+'''

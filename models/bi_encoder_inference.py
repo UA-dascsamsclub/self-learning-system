@@ -9,7 +9,7 @@ import sys
 sys.path.append('../self-learning-system')
 from database.fetch_data import fetch_query_product_pairs
 
-# Define model path once and reuse it
+# Define model path 
 model_dir = "models/model_be/"
 model_weights_path = os.path.join(model_dir, "bi_encoder_model.pth")
 
