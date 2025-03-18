@@ -7,7 +7,7 @@ import sys
 sys.path.append('../self-learning-system')
 from database.fetch_data import fetch_query_product_pairs
 
-# Define model path once and reuse it
+# Define model path 
 model_dir = "models/model_ce_trained/"
 
 # Initialize the cross-encoder model
@@ -40,11 +40,8 @@ def predict_labels():
     for i in tqdm(range(0, len(data), batch_size), desc="Predicting"):
         batch = data[i:i + batch_size]
 
-        # model.predict returns logits or probabilities depending on config
-        # If multi-class, the highest score is usually the predicted class
+        # Returns logits or probabilities
         probs = model.predict(batch, convert_to_tensor=True)
-
-        # If probs is a 2D tensor, it's multi-class scores
         probs = probs.cpu()
 
         # Get max score and predicted label index

@@ -1,4 +1,6 @@
 from sentence_transformers import CrossEncoder
+
+# Load the trained CrossEncoder model
 model_path = "models/model_ce"
 model = CrossEncoder(model_path, num_labels=4, automodel_args={'ignore_mismatched_sizes': True})
 

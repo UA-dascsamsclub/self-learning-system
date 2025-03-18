@@ -6,6 +6,10 @@ from torch.utils.data import DataLoader, Dataset
 from sentence_transformers import SentenceTransformer, util
 from bi_encoder import BiEncoderWithClassifier, BiEncoderConfig
 from transformers import AutoTokenizer
+from sklearn.preprocessing import LabelEncoder
+
+# This script trains a Bi-Encoder model with a classifier on top for multi-class classification. 
+# The process should only be run one time to train the initial model. 
 
 # Load tokenizer for the encoder model
 tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-distilroberta-v1")
@@ -38,7 +42,7 @@ def preprocess(queries, products, max_length=128):
     inputs = tokenizer(queries, products, padding=True, truncation=True, max_length=max_length, return_tensors="pt")
     return inputs["input_ids"], inputs["attention_mask"], inputs.get("token_type_ids")
 
-def train_biencoder(model, dataloader, num_epochs=5, learning_rate=1e-4):
+def train_biencoder(model, dataloader, num_epochs=3, learning_rate=1e-4):
     """
     Trains the Bi-Encoder model for multi-class classification.
     """
@@ -90,11 +94,11 @@ def train_biencoder(model, dataloader, num_epochs=5, learning_rate=1e-4):
 if __name__ == "__main__":
     import pandas as pd
     
-    # Load data from GitHub repo directly
-    csv_url = "https://raw.githubusercontent.com/sarahlawlis/esci-shopping-queries/main/data/df_golden.csv"    
+    # Load data from local CSV
+    csv_url = "/Users/thomasburns/Documents/Repos/esci-shopping-queries/data/df_golden.csv"    
 
     try:
-        df = pd.read_csv(csv_url)
+        df = pd.read_csv(csv_url, nrows=1000)
         print(f"Loaded dataset with {len(df)} records.")
     except Exception as e:
         print(f"Failed to load CSV from {csv_url}: {e}")
@@ -103,7 +107,9 @@ if __name__ == "__main__":
     # Extract queries, products, and labels
     queries = df["query"].tolist()
     products = df["product_title"].tolist()
-    labels = torch.tensor(df["encoded_labels"].tolist(), dtype=torch.long)
+    label_encoder = LabelEncoder()
+    df["esci_label"] = label_encoder.fit_transform(df["esci_label"])  
+    labels = torch.tensor(df["esci_label"].tolist(), dtype=torch.long)
 
     # Initialize dataset and dataloader
     dataset = QueryProductDataset(queries, products, labels)

@@ -7,6 +7,9 @@ from torch import nn
 from torch.optim import AdamW
 from tqdm import tqdm
 
+# This script trains a Cross Encoder model with a classifier on top for multi-class classification. 
+# The process should only be run one time to train the initial model. 
+
 class QueryProductDataset(Dataset):
     def __init__(self, samples):
         """
@@ -103,9 +106,9 @@ def train_crossencoder(model, dataset, num_epochs=3, learning_rate=1e-5, batch_s
 
 if __name__ == "__main__":
     # Load data from GitHub repo directly
-    csv_url = "https://raw.githubusercontent.com/sarahlawlis/esci-shopping-queries/main/data/df_golden.csv"    
+    csv_url = "/Users/thomasburns/Documents/Repos/esci-shopping-queries/data/df_golden.csv"    
     try:
-        df = pd.read_csv(csv_url)
+        df = pd.read_csv(csv_url, nrows=1000)
         print(f"Loaded dataset with {len(df)} records.")
 
     except Exception as e:
