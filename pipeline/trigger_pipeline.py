@@ -37,12 +37,17 @@ def main():
     logging.info("Pipeline triggered.")
 
     # PIPELINE STEPS
-    # 1. data ingestion from tbl_queryproducts
+
+    # 1. 1000 new rows in tbl_golden from UI, pipeline triggered
+
+    # 2. BE and CE fine-tuned on 1000 new annotated qp pairs
+
+    # 3. data ingestion from tbl_queryproducts
     logging.info("Fetching query-product pairs from database.")
     query_product_pairs = fetch_query_product_pairs()
     logging.info(f"Fetched {len(query_product_pairs)} query-product pairs.")
 
-    # 2. model inference
+    # 4. model inference
     model_config = config['pipeline']['model']
     model_type = model_config['type']
     model_path = model_config['path']
@@ -51,9 +56,11 @@ def main():
     df_labeled = generate_esci_labels(model_path)
     logging.info("Inference complete.")
 
-    # 3. store predictions to tbl_predictions
+    # 5. store predictions to tbl_predictions
     logging.info("Storing predictions in database.")
     store_predictions_in_db(df_labeled, model_type)
+
+    # 6. ? UI integrated here or separate
 
     # printing results for now until further steps completed
     if df_labeled is not None:
