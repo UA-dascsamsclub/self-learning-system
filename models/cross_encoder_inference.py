@@ -11,8 +11,8 @@ import datetime
 print("MPS Available:", torch.backends.mps.is_available())
 print("MPS Built:", torch.backends.mps.is_built())
 
-# Define model path once and reuse it
-model_dir = "models/model_ce_trained"
+# Define model path 
+model_dir = "models/model_ce_trained/"
 
 # Initialize the cross-encoder model
 model = CrossEncoder(
@@ -44,11 +44,8 @@ def predict_labels():
     for i in tqdm(range(0, len(data), batch_size), desc="Predicting"):
         batch = data[i:i + batch_size]
 
-        # model.predict returns logits or probabilities depending on config
-        # If multi-class, the highest score is usually the predicted class
+        # Returns logits or probabilities
         probs = model.predict(batch, convert_to_tensor=True)
-
-        # If probs is a 2D tensor, it's multi-class scores
         probs = probs.cpu()
 
         # Get max score and predicted label index
@@ -66,7 +63,7 @@ def predict_labels():
 
     return result_df
 
-
+'''
 if __name__ == "__main__":
     predictions_df = predict_labels()
     print("Predictions DataFrame:")
@@ -74,3 +71,4 @@ if __name__ == "__main__":
 
     time = datetime.datetime.now(datetime.timezone.utc) 
     predictions_df.to_excel(f'/Users/sarahlawlis/Desktop/preds_{time}.xlsx')
+'''

@@ -4,6 +4,8 @@ from database.fetch_data import fetch_query_product_pairs
 model_path = "models/model_ce"
 model = CrossEncoder(model_path, num_labels=4, automodel_args={'ignore_mismatched_sizes': True})
 
+
+'''
 scores = model.predict([('carrots', 'Fresh-Cut Vegetable Tray and Ranch Dressing, priced per pound'), 
                         ('carrots', 'Sweet Potato & Carrot Recipe, Grain Free Dry Dog Food , 23.5 lbs.'), 
                         ('carrots', 'Carrot Bar Cake, 38 oz.'),
@@ -42,4 +44,5 @@ if __name__ == "__main__":
     df_labeled = generate_esci_labels(model_path)
     
     if df_labeled is not None:
-        print(df_labeled.head())
+        print(df_labeled.head())'
+        '''
