@@ -45,7 +45,7 @@ def predict_labels():
         batch = data[i:i + batch_size]
 
         # Returns logits or probabilities
-        probs = model.predict(batch, convert_to_tensor=True)
+        probs = model.predict(batch, convert_to_tensor=True, apply_softmax=True)
         probs = probs.cpu()
 
         # Get max score and predicted label index
