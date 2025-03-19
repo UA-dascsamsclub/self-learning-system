@@ -18,13 +18,34 @@ def fetch_qp_ids(df):
         query = """SELECT "qpID", query, product FROM tbl_queryproducts"""
         qp_df = pd.read_sql(query, conn)
         return df.merge(qp_df, on=['query', 'product'], how='left')
-
+    
 def fetch_esci_ids(df):
-    """Fetches esciID for each esci_label and merges with DataFrame."""
+    """
+    Fetch ESCI IDs from the database and merge them with predictions.
+    """
     with connect_to_db() as conn:
         query = """SELECT "esciID", "esciLabel" FROM tbl_esci"""
         esci_df = pd.read_sql(query, conn)
-        return df.merge(esci_df, left_on='esci_label', right_on='esciLabel', how='left').drop(columns=['esciLabel'])
+
+    if esci_df.empty:
+        print("Error: tbl_esci returned no data!")
+        return df
+
+    label_mapping = {0: "E", 1: "S", 2: "C", 3: "I"}
+    df['esci_label'] = df['esci_label'].map(label_mapping).astype(str)
+
+    esci_df['esciLabel'] = esci_df['esciLabel'].astype(str).str.strip().str.upper()
+
+    print(f"DEBUG: Converted esci_labels in predictions: {df['esci_label'].unique()}")
+    print(f"DEBUG: Unique esciLabels in tbl_esci: {esci_df['esciLabel'].unique()}")
+
+    merged_df = df.merge(esci_df, left_on='esci_label', right_on='esciLabel', how='left').drop(columns=['esciLabel'])
+
+    missing_esci = merged_df['esciID'].isna().sum()
+    if missing_esci > 0:
+        print(f"Warning: {missing_esci} missing esciID values! Check esci_label format.")
+
+    return merged_df
 
 def get_latest_model_id(model_type):
     """Fetches the most recent modelID for the given model type."""
@@ -45,32 +66,6 @@ def get_latest_model_id(model_type):
         model_id = df.iloc[0]["modelID"]
         print(f"DEBUG: Found modelID {model_id} for model type {model_type}.")
         return model_id
-
-# def store_predictions_in_db(df, model_type):
-#     """Inserts or updates predictions in tbl_predictions."""
-#     with connect_to_db() as conn:
-#         model_id = get_latest_model_id(model_type)
-#         if model_id is None:
-#             print(f"Error: No model found for {model_type}.")
-#             return
-
-#         df = fetch_qp_ids(df)
-#         df = fetch_esci_ids(df)
-
-#         if df[['qpID', 'esciID']].isnull().any().any():
-#             return
-
-#         with conn.cursor() as cur:
-#             insert_query = """
-#             INSERT INTO tbl_predictions (qpID, esciID, modelID, confidenceScore)
-#             VALUES (%s, %s, %s, %s)
-#             ON CONFLICT (qpID, modelID) DO UPDATE
-#             SET esciID = EXCLUDED.esciID, confidenceScore = EXCLUDED.confidenceScore
-#             """
-
-#             data_to_insert = [(row['qpID'], row['esciID'], model_id, row['score']) for _, row in df.iterrows()]
-#             cur.executemany(insert_query, data_to_insert)
-#             conn.commit()
 
 def store_predictions_in_db(df, model_type):
     """Inserts or updates predictions in tbl_predictions."""

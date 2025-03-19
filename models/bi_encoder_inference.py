@@ -4,7 +4,7 @@ import pandas as pd
 from tqdm import tqdm
 from torch.cuda.amp import autocast
 from transformers import AutoTokenizer
-from bi_encoder import BiEncoderWithClassifier, BiEncoderConfig
+from models.bi_encoder import BiEncoderWithClassifier, BiEncoderConfig
 import sys
 sys.path.append('../self-learning-system')
 from database.fetch_data import fetch_query_product_pairs

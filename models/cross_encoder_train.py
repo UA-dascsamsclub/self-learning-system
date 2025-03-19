@@ -7,16 +7,12 @@ from torch import nn
 from torch.optim import AdamW
 from tqdm import tqdm
 import torch.mps
-
 torch.mps.empty_cache()
 print("MPS Available:", torch.backends.mps.is_available())
 print("MPS Built:", torch.backends.mps.is_built())
 
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 print(f"Using device: {device}")
-
-# This script trains a Cross Encoder model with a classifier on top for multi-class classification. 
-# The process should only be run one time to train the initial model. 
 
 class QueryProductDataset(Dataset):
     def __init__(self, samples):
@@ -54,19 +50,18 @@ def collate_fn(batch):
 
     return input_examples
 
-def train_crossencoder(model, dataset, num_epochs=3, learning_rate=1e-5, batch_size=16):
+def train_crossencoder(model, dataset, num_epochs=3, learning_rate=1e-5, batch_size=16, save_path="models/model_ce_trained/", fine_tune=False):
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
 
-    tokenizer = CrossEncoder(model.config).tokenizer
-    model = model.model
-
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    model_dir = os.path.join(script_dir, "model_ce_trained")
-    if not os.path.exists(model_dir):
-        os.makedirs(model_dir)
-    
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
     optimizer = AdamW(model.model.parameters(), lr=learning_rate)
-    
+
+    if fine_tune:
+        print("🔹 Fine-tuning mode: Freezing early layers...")
+        for param in model.model.base_model.parameters():
+            param.requires_grad = False
+
     for epoch in range(num_epochs):
         model.model.train()
         total_loss = 0
@@ -80,11 +75,7 @@ def train_crossencoder(model, dataset, num_epochs=3, learning_rate=1e-5, batch_s
             query = [sample.texts[0] for sample in sentences]
             product = [sample.texts[1] for sample in sentences]
 
-            query = [str(q) for q in query]
-            product = [str(p) for p in product]
-            
-            #tokenizer = model.model.tokenizer
-            inputs = tokenizer(
+            inputs = model.tokenizer(
                 query,
                 product,
                 truncation=True,
@@ -96,7 +87,7 @@ def train_crossencoder(model, dataset, num_epochs=3, learning_rate=1e-5, batch_s
             inputs = {k: v.to(device) for k, v in inputs.items()}
             labels = labels.to(device)
             
-            outputs = model(**inputs)
+            outputs = model.model(**inputs)
             logits = outputs.logits
             
             loss_fn = nn.CrossEntropyLoss()
@@ -116,13 +107,13 @@ def train_crossencoder(model, dataset, num_epochs=3, learning_rate=1e-5, batch_s
         avg_loss = total_loss / len(dataloader)
         print(f"Epoch {epoch + 1} - Loss: {avg_loss:.4f}, Accuracy: {accuracy:.2f}%")
     
-    model.save_pretrained(model_dir)
-    model.tokenizer.save_pretrained(model_dir)
-    print("CrossEncoder model saved in model_ce_trained/ directory!")
+    model.model.save_pretrained(save_path)
+    model.tokenizer.save_pretrained(save_path)
+    print(f"Model saved in {save_path} (Fine-tuning: {fine_tune})")
 
 if __name__ == "__main__":
     # Load data from GitHub repo directly
-    csv = '/Users/thomasburns/Documents/Repos/esci-shopping-queries/data/df_golden.csv'
+    csv = '/Users/sarahlawlis/Documents/repos/self-learning-system/df_golden.csv'
     try:
         df = pd.read_csv(csv)
         print(f"Loaded dataset with {len(df)} records.")
@@ -151,8 +142,7 @@ if __name__ == "__main__":
         automodel_args={'ignore_mismatched_sizes': True}
     )
 
-    model.to(device)
-'''
+    model.model.to(device)
+
     # Train the model
-    train_crossencoder(model, dataset)'
-'''
+    train_crossencoder(model, dataset)
