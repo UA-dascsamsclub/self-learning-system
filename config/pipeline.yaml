@@ -1,8 +1,18 @@
 pipeline:
+  base_dir: "../self-learning-system"
+
   model:
     type: "crossencoder"
-    path: "/Users/sarahlawlis/Desktop/repos/self-learning-system/models/model_ce"
+    path: "models/model_ce_finetuned"
   
+  finetuning:
+    biencoder_script: "models/bi_encoder_finetune.py"
+    crossencoder_script: "models/cross_encoder_finetune.py"
+
+  inference:
+    biencoder_script: "models/bi_encoder_inference.py"
+    crossencoder_script: "models/cross_encoder_inference.py"
+
   logging:
     level: "INFO"
     log_file: "logs/pipeline.log"
