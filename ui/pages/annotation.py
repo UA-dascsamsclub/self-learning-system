@@ -80,7 +80,7 @@ def show_annotation_page():
     st.write("---")
 
     if len(st.session_state.annotations) > 0:
-        st.write("### Golden Dataset")
+        st.write(f"### Golden Dataset [Completed {len(st.session_state.annotations)}/50]")
         annotated_df = pd.DataFrame(st.session_state.annotations)
         st.dataframe(annotated_df)
 
