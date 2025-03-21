@@ -89,6 +89,8 @@ def show_annotation_page():
             with col1:
                 if st.button("Push Annotations to Database", key='push_annotations', use_container_width=True):
                     annotated_df = pd.DataFrame(st.session_state.annotations)
+                    st.write("Annotations DataFrame before inserting into DB:")
+                    st.dataframe(annotated_df)
                     push_annotations_to_database(annotated_df)
                     st.success("Annotations successfully pushed to database!")
 
@@ -181,29 +183,47 @@ def push_annotations_to_database(annotations_df):
             ]
 
             # temporary table for bulk insert
+            # with conn.cursor() as tmp_cur:
+            #     tmp_cur.execute("""
+            #     CREATE TEMP TABLE tmp_import (
+            #         "query" TEXT, 
+            #         "product_title" TEXT, 
+            #         "esci_label" TEXT
+            #     ) ON COMMIT DROP;
+            #     """)
+                
+            #     psycopg2.extras.execute_values(
+            #         tmp_cur,
+            #         """INSERT INTO tmp_import ("query", "product_title", "esci_label") 
+            #            VALUES %s""",
+            #         annotations_tuples
+            #     )
+
             with conn.cursor() as tmp_cur:
                 tmp_cur.execute("""
                 CREATE TEMP TABLE tmp_import (
+                    "qpID" INT,
                     "query" TEXT, 
                     "product_title" TEXT, 
-                    "esci_label" TEXT
+                    "esci_label" TEXT,
+                    "modelID" INT
                 ) ON COMMIT DROP;
                 """)
-                
+
                 psycopg2.extras.execute_values(
                     tmp_cur,
-                    """INSERT INTO tmp_import ("query", "product_title", "esci_label") 
-                       VALUES %s""",
-                    annotations_tuples
+                    """INSERT INTO tmp_import ("qpID", "query", "product_title", "esci_label", "modelID") 
+                    VALUES %s""",
+                    [
+                        (row["qpID"], row["query"], row["product_title"], row["annotated_label"], row["modelID"])
+                        for _, row in annotations_df.iterrows()
+                    ]
                 )
 
                 # insert esci label IDs paired with qpID and analystID into tbl_golden
                 tmp_cur.execute("""
                 WITH latest_golden AS (
                    SELECT MAX("goldenID") AS "goldenID" FROM tbl_versiongolden
-                ),
-                latest_model AS (
-                   SELECT MAX("modelID") AS "modelID" FROM tbl_models
                 )
                 INSERT INTO tbl_golden ("qpID", "esciID", "goldenID", "analystID", "modelID")
                 SELECT DISTINCT ON (qp."qpID", lg."goldenID")
@@ -211,14 +231,15 @@ def push_annotations_to_database(annotations_df):
                    e."esciID",
                    lg."goldenID",
                    %s,  -- Adding analystID here
-                   lm."modelID"  
+                   p."modelID"  
                 FROM tmp_import t
                 JOIN tbl_queryproducts qp 
                    ON t."query" = qp."query" AND t."product_title" = qp."product"
                 JOIN tbl_esci e 
                    ON t."esci_label" = e."esciLabel"
+                JOIN tbl_predictions p
+                    ON t."qpID" = p."qpID"
                 CROSS JOIN latest_golden lg
-                CROSS JOIN latest_model lm
                 ON CONFLICT ("qpID", "goldenID") 
                 DO UPDATE SET 
                    "esciID" = EXCLUDED."esciID",

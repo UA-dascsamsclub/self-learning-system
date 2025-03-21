@@ -2,7 +2,6 @@ import streamlit as st
 from pages import login, annotation
 from utils.session import initialize_session
 
-# Initialize session state
 initialize_session()
 
 # Route between pages

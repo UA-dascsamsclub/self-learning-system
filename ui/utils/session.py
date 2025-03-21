@@ -7,22 +7,23 @@ def initialize_session():
     # selecting from the tbl_predictions table 
     query = """
         SELECT 
-            qp."qpID",
-            qp."confidenceScore",
-            qp."esciID",
-            qproduct.query,
-            qproduct.product
+            p."qpID",
+            p."confidenceScore",
+            p."esciID",
+            p."modelID",
+            qp.query,
+            qp.product
         FROM 
-            tbl_predictions AS qp
+            tbl_predictions AS p
         JOIN 
-            tbl_queryproducts AS qproduct 
+            tbl_queryproducts AS qp 
         ON 
-            qp."qpID" = qproduct."qpID"
+            p."qpID" = qp."qpID"
         WHERE 
             NOT EXISTS (
                 SELECT 1 
                 FROM tbl_golden g 
-                WHERE g."qpID" = qp."qpID"
+                WHERE g."qpID" = p."qpID"
             )
         LIMIT 50;
     """  
@@ -49,22 +50,23 @@ def initialize_session():
 def reset_session_variables():
     query = """
         SELECT 
-            qp."qpID",
-            qp."confidenceScore",
-            qp."esciID",
-            qproduct.query,
-            qproduct.product
+            p."qpID",
+            p."confidenceScore",
+            p."esciID",
+            p."modelID",
+            qp.query,
+            qp.product
         FROM 
-            tbl_predictions AS qp
+            tbl_predictions AS p
         JOIN 
-            tbl_queryproducts AS qproduct 
+            tbl_queryproducts AS qp 
         ON 
-            qp."qpID" = qproduct."qpID"
+            p."qpID" = qp."qpID"
         WHERE 
             NOT EXISTS (
                 SELECT 1 
                 FROM tbl_golden g 
-                WHERE g."qpID" = qp."qpID"
+                WHERE g."qpID" = p."qpID"
             )
         LIMIT 50;
     """  
