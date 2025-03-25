@@ -50,7 +50,7 @@ def load_or_initialize_ce_model():
 def finetune_crossencoder(df_golden):
     if df_golden is None or df_golden.empty:
         print("No data provided for fine-tuning. Exiting.")
-        return False
+        return None
 
     queries = df_golden['query'].tolist()
     products = df_golden['product'].tolist()
@@ -63,11 +63,9 @@ def finetune_crossencoder(df_golden):
 
     train_crossencoder(model, dataset, num_epochs=3, learning_rate=1e-6, batch_size=16, save_path="models/model_ce_finetuned/", fine_tune=True)
 
-    model_id = insert_model("crossencoder")
-    print(f"Stored fine-tuned Cross-Encoder model with modelID {model_id}")
-
     print("Fine-tuning complete.")
-    return True
+    return "crossencoder", finetuned_model_path
+
 
 if __name__ == "__main__":
     df_golden = fetch_golden()

@@ -36,7 +36,7 @@ def load_or_initialize_be_model():
 def finetune_biencoder(df_golden):
     if df_golden is None or df_golden.empty:
         print("No data provided for fine-tuning. Exiting.")
-        return False
+        return None
 
     queries = df_golden['query'].tolist()
     products = df_golden['product'].tolist()
@@ -52,11 +52,8 @@ def finetune_biencoder(df_golden):
 
     train_biencoder(model, dataloader, num_epochs=epochs, learning_rate=learning_rate, save_path="models/model_be_finetuned/", fine_tune=True)
 
-    model_id = insert_model("biencoder")
-    print(f"Stored fine-tuned Bi-Encoder model with modelID {model_id}")
-
     print("Fine-tuning complete.")
-    return True
+    return "biencoder", finetuned_model_path
 
 if __name__ == "__main__":
     df_golden = fetch_golden(limit=1000)

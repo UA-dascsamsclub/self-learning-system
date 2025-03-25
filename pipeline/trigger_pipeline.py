@@ -10,6 +10,7 @@ from models.cross_encoder_finetune import finetune_crossencoder
 from models.bi_encoder_inference import predict_labels as bi_encoder_predict
 from models.cross_encoder_inference import predict_labels as cross_encoder_predict
 from database.store_predictions import store_predictions_in_db
+from database.store_model import insert_model
 
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), "../config/pipeline.yaml")
 
@@ -54,13 +55,23 @@ def main():
 
     # 2. Fine-tune Bi-Encoder and Cross-Encoder
     logging.info("Starting fine-tuning for Bi-Encoder and Cross-Encoder.")
-    
-    be_success = finetune_biencoder(df_golden)
-    ce_success = finetune_crossencoder(df_golden)
 
-    if not (be_success and ce_success):
+    be_result = finetune_biencoder(df_golden)
+    ce_result = finetune_crossencoder(df_golden)
+
+    if not (be_result and ce_result):
         logging.error("Fine-tuning failed. Stopping pipeline.")
         return
+
+    # Insert models into DB
+    be_model_type, be_model_path = be_result
+    ce_model_type, ce_model_path = ce_result
+
+    be_model_id = insert_model(be_model_type)
+    ce_model_id = insert_model(ce_model_type)
+
+    logging.info(f"Stored Bi-Encoder with modelID {be_model_id}")
+    logging.info(f"Stored Cross-Encoder with modelID {ce_model_id}")
 
     # 3. Fetch query-product pairs for inference
     logging.info("Fetching query-product pairs from database.")
