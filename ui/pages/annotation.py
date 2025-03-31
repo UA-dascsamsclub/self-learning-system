@@ -261,7 +261,9 @@ def save_annotation(row, label):
         'query': row['query'],
         'product_title': row['product'],
         'original_label': esci_mapping.get(row['esciID']),
-        'annotated_label': label
+        'annotated_label': label,
+        'qpID': row['qpID'],
+        'modelID': row['modelID']
     }
 
     st.session_state.annotation_history.append(new_annotation)
