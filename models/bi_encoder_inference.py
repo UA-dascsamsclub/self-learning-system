@@ -4,31 +4,12 @@ import pandas as pd
 from tqdm import tqdm
 from torch.cuda.amp import autocast
 from transformers import AutoTokenizer
-from models.bi_encoder import BiEncoderWithClassifier, BiEncoderConfig
+from bi_encoder import BiEncoderWithClassifier, BiEncoderConfig
 import sys
 sys.path.append('../self-learning-system')
 from database.fetch_data import fetch_query_product_pairs
 
-# Define model path 
-model_dir = "models/model_be/"
-model_weights_path = os.path.join(model_dir, "bi_encoder_model.pth")
-
-# Load tokenizer from the same directory
-tokenizer = AutoTokenizer.from_pretrained(model_dir)
-
-# Initialize config from model directory (if saved), else hardcode or pass manually
-# You can adjust this if you have a config.json in the directory
-config = BiEncoderConfig.from_pretrained(model_dir) if hasattr(BiEncoderConfig, 'from_pretrained') else BiEncoderConfig(
-    encoder_name="sentence-transformers/all-distilroberta-v1",
-    num_classes=4
-)
-
-# Initialize and load the model weights
-model = BiEncoderWithClassifier(config)
-model.load_state_dict(torch.load(model_weights_path, map_location=torch.device("cpu")))
-model.eval()
-
-def predict_labels():
+def predict_labels(df, model, tokenizer):
     """
     Runs inference on query-product pairs pulled from the database.
     Returns a DataFrame with query, product, score, and esci_label columns.
@@ -36,7 +17,6 @@ def predict_labels():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
-    df = fetch_query_product_pairs(limit=1000)
 
     if df is None or df.empty:
         print("No query-product pairs fetched. Exiting inference.")
@@ -44,7 +24,7 @@ def predict_labels():
 
     data = list(zip(df['query'], df['product']))
 
-    batch_size = 8
+    batch_size = 2
     dataloader = torch.utils.data.DataLoader(data, batch_size=batch_size, shuffle=False)
 
     results = []
@@ -62,8 +42,16 @@ def predict_labels():
 
             with autocast():
                 outputs = model(**inputs)
+                # Check for NaNs in raw model outputs
+                #if torch.any(torch.isnan(outputs)):
+                #    print("NaN detected in raw model outputs.")
+                #    continue  # Skip this batch if NaNs are found
 
                 probs = torch.nn.functional.softmax(outputs, dim=1)
+                # Check for NaNs in softmax outputs
+                #if torch.any(torch.isnan(probs)):
+                #    print("NaN detected in softmax outputs.")
+                #    continue  # Skip this batch if NaNs are found
 
                 max_scores, predicted_classes = torch.max(probs, dim=1)
 
@@ -84,9 +72,30 @@ def predict_labels():
 
     return result_df
 
-'''
+
 if __name__ == "__main__":
-    predictions_df = predict_labels()
+    df = fetch_query_product_pairs(limit=1000)
+    # Define model path 
+    model_dir = "models/model_be/"
+
+    # Get the model weights path
+    model_weights_path = os.path.join(model_dir, "bi_encoder_model.pth")
+
+    # Load tokenizer from the same directory
+    tokenizer = AutoTokenizer.from_pretrained(model_dir)
+
+    # Initialize config from model directory (if saved), else hardcode or pass manually
+    # You can adjust this if you have a config.json in the directory
+    config = BiEncoderConfig.from_pretrained(model_dir) if hasattr(BiEncoderConfig, 'from_pretrained') else BiEncoderConfig(
+        encoder_name="sentence-transformers/all-distilroberta-v1",
+        num_classes=4
+    )
+
+    # Initialize and load the model weights
+    model = BiEncoderWithClassifier(config)
+    model.load_state_dict(torch.load(model_weights_path, map_location=torch.device("cpu")))
+    model.eval()
+    predictions_df = predict_labels(df, model, tokenizer)
     print("Predictions DataFrame:")
     print(predictions_df.head())
-    '''
+    

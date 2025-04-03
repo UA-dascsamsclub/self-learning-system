@@ -11,17 +11,8 @@ import datetime
 print("MPS Available:", torch.backends.mps.is_available())
 print("MPS Built:", torch.backends.mps.is_built())
 
-# Define model path 
-model_dir = "models/model_ce_trained/"
 
-# Initialize the cross-encoder model
-model = CrossEncoder(
-    model_dir,
-    num_labels=4,
-    automodel_args={'ignore_mismatched_sizes': True}
-)
-
-def predict_labels():
+def predict_labels(df, model):
     """
     Runs inference on query-product pairs pulled from the database using a sentence-transformers CrossEncoder.
     Returns a DataFrame with query, product, score, and esci_label columns.
@@ -29,15 +20,13 @@ def predict_labels():
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     model.model.to(device)
 
-    df = fetch_query_product_pairs(limit=1000)
-
     if df is None or df.empty:
         print("No query-product pairs fetched. Exiting inference.")
         return pd.DataFrame(columns=["query", "product", "score", "esci_label"])
 
     data = list(zip(df['query'], df['product']))
 
-    batch_size = 8
+    batch_size = 16
     results = []
 
     # Process in batches
@@ -63,12 +52,21 @@ def predict_labels():
 
     return result_df
 
-'''
+
 if __name__ == "__main__":
-    predictions_df = predict_labels()
+    # Define model path 
+    model_path = "models/model_ce_trained/"
+    
+    # Initialize the cross-encoder model
+    model = CrossEncoder(
+        model_path,
+        num_labels=4,
+        automodel_args={'ignore_mismatched_sizes': True}
+    )
+
+    # Fetch query-product pairs from the database
+    df = fetch_query_product_pairs(limit=1000)
+    predictions_df = predict_labels(df, model)
     print("Predictions DataFrame:")
     print(predictions_df.head())
 
-    time = datetime.datetime.now(datetime.timezone.utc) 
-    predictions_df.to_excel(f'/Users/sarahlawlis/Desktop/preds_{time}.xlsx')
-'''
