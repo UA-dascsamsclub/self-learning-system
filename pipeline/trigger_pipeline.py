@@ -114,9 +114,9 @@ def main():
     logging.info(f"Running inference using model type: {model_type}.")
 
     if model_type == "crossencoder":
-        df_labeled = cross_encoder_predict(query_product_pairs, model=ce_result)
+        df_labeled = cross_encoder_predict(query_product_pairs, model=ce_model_path)
     elif model_type == "biencoder":
-        df_labeled = bi_encoder_predict(query_product_pairs, model=be_result)
+        df_labeled = bi_encoder_predict(query_product_pairs, model=be_model_path)
     else:
         logging.error("Invalid model type in config. Exiting pipeline.")
         return
