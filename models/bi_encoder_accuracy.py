@@ -2,8 +2,8 @@ import os
 import sys
 import pandas as pd
 from sklearn.metrics import accuracy_score, recall_score, f1_score
-from bi_encoder_inference import predict_labels as bi_encoder_predict
-from bi_encoder import BiEncoderWithClassifier, BiEncoderConfig
+from models.bi_encoder_inference import predict_labels as bi_encoder_predict
+from models.bi_encoder import BiEncoderWithClassifier, BiEncoderConfig
 import torch
 from transformers import AutoTokenizer
 sys.path.append('../self-learning-system')
