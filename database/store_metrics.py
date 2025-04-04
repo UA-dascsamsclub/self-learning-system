@@ -1,6 +1,6 @@
 import psycopg2
-from db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
-from store_predictions import get_latest_model_id
+from database.db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+from database.store_predictions import get_latest_model_id
 import pandas as pd
 
 def connect_to_db():
