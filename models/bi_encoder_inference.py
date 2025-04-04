@@ -9,41 +9,41 @@ import sys
 sys.path.append('../self-learning-system')
 from database.fetch_data import fetch_query_product_pairs
 
-# Define model path 
-model_dir = "models/model_be/"
-model_weights_path = os.path.join(model_dir, "bi_encoder_model.pth")
-
-# Load tokenizer from the same directory
-tokenizer = AutoTokenizer.from_pretrained(model_dir)
-
-# Initialize config from model directory (if saved), else hardcode or pass manually
-# You can adjust this if you have a config.json in the directory
-config = BiEncoderConfig.from_pretrained(model_dir) if hasattr(BiEncoderConfig, 'from_pretrained') else BiEncoderConfig(
-    encoder_name="sentence-transformers/all-distilroberta-v1",
-    num_classes=4
-)
-
-# Initialize and load the model weights
-model = BiEncoderWithClassifier(config)
-model.load_state_dict(torch.load(model_weights_path, map_location=torch.device("cpu")))
-model.eval()
-
-def predict_labels():
+def predict_labels(df, model):
     """
-    Runs inference on query-product pairs pulled from the database.
+    Runs inference on query-product pairs using the specified model directory.
     Returns a DataFrame with query, product, score, and esci_label columns.
-    """
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
 
-    df = fetch_query_product_pairs(limit=1000)
+    Args:
+        df (pd.DataFrame): DataFrame with columns 'query' and 'product'.
+        model (str): Path to the model directory containing tokenizer and weights.
+    """
+
+    if not isinstance(model, str) or not os.path.exists(model):
+        raise ValueError(f"Invalid model directory: {model}")
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # Load tokenizer and config
+    tokenizer = AutoTokenizer.from_pretrained(model)
+
+    config = BiEncoderConfig.from_pretrained(model) if hasattr(BiEncoderConfig, 'from_pretrained') else BiEncoderConfig(
+        encoder_name="sentence-transformers/all-distilroberta-v1",
+        num_classes=4
+    )
+
+    # Load model and weights
+    model_weights_path = os.path.join(model, "bi_encoder_model.pth")
+    model_obj = BiEncoderWithClassifier(config)
+    model_obj.load_state_dict(torch.load(model_weights_path, map_location=device))
+    model_obj.to(device)
+    model_obj.eval()
 
     if df is None or df.empty:
-        print("No query-product pairs fetched. Exiting inference.")
+        print("No query-product pairs provided. Exiting inference.")
         return pd.DataFrame(columns=["query", "product", "score", "esci_label"])
 
     data = list(zip(df['query'], df['product']))
-
     batch_size = 8
     dataloader = torch.utils.data.DataLoader(data, batch_size=batch_size, shuffle=False)
 
@@ -61,10 +61,8 @@ def predict_labels():
             ).to(device)
 
             with autocast():
-                outputs = model(**inputs)
-
+                outputs = model_obj(**inputs)
                 probs = torch.nn.functional.softmax(outputs, dim=1)
-
                 max_scores, predicted_classes = torch.max(probs, dim=1)
 
                 predicted_classes = predicted_classes.cpu().tolist()
@@ -81,12 +79,15 @@ def predict_labels():
             torch.cuda.empty_cache()
 
     result_df = pd.DataFrame(results, columns=["query", "product", "score", "esci_label"])
-
     return result_df
 
-'''
 if __name__ == "__main__":
-    predictions_df = predict_labels()
+    from database.fetch_data import fetch_query_product_pairs
+
+    df = fetch_query_product_pairs(limit=1000)
+    model_dir = "models/model_be/"
+
+    predictions_df = predict_labels(df, model=model_dir)
     print("Predictions DataFrame:")
     print(predictions_df.head())
-    '''
+    
