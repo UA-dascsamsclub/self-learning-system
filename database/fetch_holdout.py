@@ -1,6 +1,6 @@
 import psycopg2
 import pandas as pd
-from database.db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+from db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
 def connect_to_db():
     """Establishes a connection to the PostgreSQL database."""
@@ -14,8 +14,9 @@ def connect_to_db():
 
 def fetch_holdout(limit=100000):
     query = f"""
-    SELECT query, product, esciID
+    SELECT h.query, h.product, e."esciID"
     FROM tbl_holdout h
+    JOIN tbl_esci e ON (h."esciID" = e."esciID")
     LIMIT {limit}
     """
 
