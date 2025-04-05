@@ -14,9 +14,8 @@ def connect_to_db():
 
 def fetch_holdout(limit=100000):
     query = f"""
-    SELECT qp.query, qp.product, h."esciID"
+    SELECT h.query, h.product, h."esciID"
     FROM tbl_holdout h
-    JOIN tbl_queryproducts qp ON (qp."qpID" = h."hqpID")
     LIMIT {limit}
     """
 

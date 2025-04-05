@@ -1,7 +1,7 @@
 import os
 import sys
 import pandas as pd
-from sklearn.metrics import accuracy_score, recall_score, f1_score
+from sklearn.metrics import precision_score, recall_score, f1_score
 from models.bi_encoder_inference import predict_labels as bi_encoder_predict
 from models.bi_encoder import BiEncoderWithClassifier, BiEncoderConfig
 import torch
