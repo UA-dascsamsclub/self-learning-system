@@ -72,6 +72,15 @@ def main():
     be_model_type, be_model_path = be_result
     ce_model_type, ce_model_path = ce_result
 
+    # Insert models into DB
+    be_model_id = insert_model(be_model_type)
+    ce_model_id = insert_model(ce_model_type)
+
+    logging.info(f"Stored Bi-Encoder with modelID {be_model_id}")
+    logging.info(f"Stored Cross-Encoder with modelID {ce_model_id}")
+
+    # 3. Calculate and Store Metrics
+
     # Evaluate model accuracy using holdout data
     holdout_df = fetch_holdout(limit=100000)
     if holdout_df is None or holdout_df.empty:
@@ -86,18 +95,11 @@ def main():
     be_scores = calculate_be_metrics(model=be_result, df=be_accuracy_df)
     ce_scores = calculate_ce_metrics(model=ce_result, df=ce_accuracy_df)
 
-    # Insert models into DB
-    be_model_id = insert_model(be_model_type)
-    ce_model_id = insert_model(ce_model_type)
-
-    logging.info(f"Stored Bi-Encoder with modelID {be_model_id}")
-    logging.info(f"Stored Cross-Encoder with modelID {ce_model_id}")
-
     # Push metrics to DB
     store_model_metrics(model_type=be_model_type, model_id=be_model_id, df=be_scores)
     store_model_metrics(model_type=ce_model_type,model_id=ce_model_id, df=ce_scores)
 
-    # 3. Fetch query-product pairs for inference
+    # 4. Fetch query-product pairs for inference
     logging.info("Fetching query-product pairs from database.")
     query_product_pairs = fetch_query_product_pairs()
 
@@ -107,7 +109,7 @@ def main():
 
     logging.info(f"Fetched {len(query_product_pairs)} query-product pairs.")
 
-    # 4. Model inference using fine-tuned model
+    # 5. Model inference using fine-tuned model
     model_config = config['pipeline']['model']
     model_type = model_config['type']
     
@@ -127,12 +129,11 @@ def main():
 
     logging.info("Inference complete.")
 
-    # 5. Store predictions in tbl_predictions
+    # 6. Store predictions in tbl_predictions
     logging.info("Storing predictions in database.")
     store_predictions_in_db(df_labeled, model_type)
 
-    # 6. Printing results for now
-    print(df_labeled.head())
+    # 7. Printing complete message
     logging.info("Pipeline completed successfully.")
 
 if __name__ == "__main__":
