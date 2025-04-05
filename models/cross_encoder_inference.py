@@ -61,6 +61,10 @@ def predict_labels(df, model):
             })
 
     result_df = pd.DataFrame(results, columns=["query", "product", "score", "esci_label"])
+    num_nans = result_df["esci_label"].isna().sum()
+    if num_nans > 0:
+        print(f"Warning: Dropping {num_nans} rows with NaN predictions.")
+    result_df = result_df.dropna(subset=["esci_label"])
     return result_df
 
 if __name__ == "__main__":

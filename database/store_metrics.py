@@ -26,9 +26,9 @@ def store_model_metrics(model_type, model_id, df):
             '''
             
             # Extract metrics from dataframe
-            precision = df["precision"].values[0]
-            recall = df["recall"].values[0]
-            microf1 = df["microf1"].values[0]
+            precision = float(df["precision"].values[0])
+            recall = float(df["recall"].values[0])
+            microf1 = float(df["microf1"].values[0])
             
             # Insert accuracy metrics into tbl_accuracy
             insert_accuracy_query = """
