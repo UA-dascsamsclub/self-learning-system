@@ -13,17 +13,10 @@ def connect_to_db():
         port=DB_PORT
     )
 
-def store_model_metrics(model_type, model_id, df):
+def store_model_metrics(model_id, df):
     """Stores accuracy metrics from df in tbl_accuracy and links them to the latest model in tbl_model_accuracy."""
     with connect_to_db() as conn:
         with conn.cursor() as cur:
-            '''
-            # Fetch latest model ID for the given model type
-            model_id = int(get_latest_model_id(model_type))
-            if model_id is None:
-                print(f"Error: No model found for {model_type}. Exiting storage.")
-                return'
-            '''
             
             # Extract metrics from dataframe
             precision = float(df["precision"].values[0])

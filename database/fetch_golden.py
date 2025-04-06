@@ -17,7 +17,7 @@ def fetch_golden(limit=1000):
     SELECT qp.query, qp.product, g."esciID"
     FROM tbl_golden g
     JOIN tbl_queryproducts qp ON (qp."qpID" = g."qpID")
-    LIMIT {limit}
+    WHERE g."modelID" = (SELECT MAX("modelID") FROM tbl_golden)
     """
 
     try:
@@ -32,4 +32,5 @@ def fetch_golden(limit=1000):
 if __name__ == "__main__":
     df = fetch_golden()
     if df is not None:
-        print(df.head())
+        print(len(df))
+        

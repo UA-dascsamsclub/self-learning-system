@@ -31,6 +31,10 @@ def calculate_ce_metrics(df, model):
 
     # Merge predictions back into the input DataFrame (ensure order aligns)
     df["esci_label_predicted"] = prediction_df["esci_label"]
+    df = df.dropna(subset=["esci_label_predicted"])
+
+    df["esciID"] = df["esciID"].astype(int)
+    df["esci_label_predicted"] = df["esci_label_predicted"].astype(int)
 
     # Extract labels
     y_true = df['esciID']

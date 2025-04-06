@@ -50,7 +50,7 @@ def main():
 
     # 1. Fetch 1000 new annotated query-product pairs
     logging.info("Fetching labeled query-product pairs from tbl_golden.")
-    df_golden = fetch_golden(limit=1000)
+    df_golden = fetch_golden()
 
     if df_golden is None or df_golden.empty:
         logging.error("No data fetched from tbl_golden. Exiting pipeline.")
@@ -96,8 +96,8 @@ def main():
     ce_scores = calculate_ce_metrics(model=ce_result, df=ce_accuracy_df)
 
     # Push metrics to DB
-    store_model_metrics(model_type=be_model_type, model_id=be_model_id, df=be_scores)
-    store_model_metrics(model_type=ce_model_type,model_id=ce_model_id, df=ce_scores)
+    store_model_metrics(model_id=be_model_id, df=be_scores)
+    store_model_metrics(model_id=ce_model_id, df=ce_scores)
 
     # 4. Fetch query-product pairs for inference
     logging.info("Fetching query-product pairs from database.")

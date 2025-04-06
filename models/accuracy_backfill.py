@@ -59,7 +59,6 @@ if __name__ == "__main__":
 
         df = df.dropna(subset=["esci_label_predicted"])
 
-        # Convert to int (sklearn may error on float labels)
         df["esciID"] = df["esciID"].astype(int)
         df["esci_label_predicted"] = df["esci_label_predicted"].astype(int)
 

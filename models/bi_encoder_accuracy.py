@@ -21,26 +21,8 @@ def calculate_be_metrics(df, model):
         pd.DataFrame: A one-row DataFrame with precision, recall, and micro-F1.
     """
 
-    if not isinstance(model, str) or not os.path.exists(model):
-        raise ValueError(f"Invalid model path provided: {model}")
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    # Load tokenizer and config
-    tokenizer = AutoTokenizer.from_pretrained(model)
-    config = BiEncoderConfig.from_pretrained(model) if hasattr(BiEncoderConfig, 'from_pretrained') else BiEncoderConfig(
-        encoder_name="sentence-transformers/all-distilroberta-v1",
-        num_classes=4
-    )
-
-    # Load model weights
-    model_weights_path = os.path.join(model, "bi_encoder_model.pth")
-    model_obj = BiEncoderWithClassifier(config)
-    model_obj.load_state_dict(torch.load(model_weights_path, map_location=device))
-    model_obj.eval()
-
     # Predict labels
-    prediction_df = bi_encoder_predict(df, model=model_obj, tokenizer=tokenizer)
+    prediction_df = bi_encoder_predict(df, model)
 
     if prediction_df.empty:
         print("No predictions generated.")
@@ -48,10 +30,11 @@ def calculate_be_metrics(df, model):
 
     # Assign predicted labels back to df (assumes original df is same order)
     df["esci_label_predicted"] = prediction_df["esci_label"]
-    print(f"Number of Nulls:  {df['esci_label_predicted'].isnull().sum()}")
 
-    print(df['esci_label_predicted'].value_counts())
-    print(df['esciID'].value_counts()) 
+    df = df.dropna(subset=["esci_label_predicted"])
+
+    df["esciID"] = df["esciID"].astype(int)
+    df["esci_label_predicted"] = df["esci_label_predicted"].astype(int)
 
     y_true = df['esciID']
     y_pred = df['esci_label_predicted']
