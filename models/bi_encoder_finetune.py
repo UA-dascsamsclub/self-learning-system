@@ -5,7 +5,6 @@ from sklearn.preprocessing import LabelEncoder
 from models.bi_encoder import BiEncoderWithClassifier, BiEncoderConfig
 from models.bi_encoder_train import train_biencoder, QueryProductDataset
 from database.fetch_golden import fetch_golden
-from database.store_model import insert_model
 
 # Configuration
 pretrained_model_path = "models/model_be/bi_encoder_model.pth"

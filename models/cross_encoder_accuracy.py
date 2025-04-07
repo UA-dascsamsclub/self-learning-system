@@ -30,7 +30,10 @@ def calculate_ce_metrics(df, model):
         return pd.DataFrame(columns=["precision", "recall", "microf1"])
 
     # Merge predictions back into the input DataFrame (ensure order aligns)
+    df = df.reset_index(drop=True)
+    prediction_df = prediction_df.reset_index(drop=True)
     df["esci_label_predicted"] = prediction_df["esci_label"]
+    
     df = df.dropna(subset=["esci_label_predicted"])
 
     df["esciID"] = df["esciID"].astype(int)

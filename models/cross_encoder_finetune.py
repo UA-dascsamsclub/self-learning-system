@@ -2,7 +2,6 @@ import os
 import torch
 from models.cross_encoder_train import train_crossencoder, QueryProductDataset
 from database.fetch_golden import fetch_golden
-from database.store_model import insert_model
 from sentence_transformers import CrossEncoder, InputExample
 from safetensors.torch import load_file
 

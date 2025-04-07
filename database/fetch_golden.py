@@ -33,4 +33,3 @@ if __name__ == "__main__":
     df = fetch_golden()
     if df is not None:
         print(len(df))
-        

@@ -68,9 +68,11 @@ def main():
         logging.error("Fine-tuning failed. Stopping pipeline.")
         return
     
-    # Capture model type and path
+    # Capture model type, path, and directory
     be_model_type, be_model_path = be_result
+    be_model_dir = os.path.dirname(be_model_path)
     ce_model_type, ce_model_path = ce_result
+    ce_model_dir = os.path.dirname(ce_model_path)
 
     # Insert models into DB
     be_model_id = insert_model(be_model_type)
@@ -86,18 +88,15 @@ def main():
     if holdout_df is None or holdout_df.empty:
         logging.error("No holdout data fetched. Exiting pipeline.")
         return
-    
-    # Make predictions using the holdout dataset and store them in a new df
-    be_accuracy_df = bi_encoder_predict(holdout_df, model=be_result)
-    ce_accuracy_df = cross_encoder_predict(holdout_df, model=ce_result)
 
     # Calculate metrics
-    be_scores = calculate_be_metrics(model=be_result, df=be_accuracy_df)
-    ce_scores = calculate_ce_metrics(model=ce_result, df=ce_accuracy_df)
+    be_scores = calculate_be_metrics(model=be_model_dir, df=holdout_df)
+    ce_scores = calculate_ce_metrics(model=ce_model_dir, df=holdout_df)
 
     # Push metrics to DB
     store_model_metrics(model_id=be_model_id, df=be_scores)
     store_model_metrics(model_id=ce_model_id, df=ce_scores)
+    logging.info("Stored model metrics for bi-encoder and cross-encoder models.")
 
     # 4. Fetch query-product pairs for inference
     logging.info("Fetching query-product pairs from database.")
