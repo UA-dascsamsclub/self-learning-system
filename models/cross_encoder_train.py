@@ -7,6 +7,7 @@ from torch import nn
 from torch.optim import AdamW
 from tqdm import tqdm
 import torch.mps
+import string
 torch.mps.empty_cache()
 print("MPS Available:", torch.backends.mps.is_available())
 print("MPS Built:", torch.backends.mps.is_built())
@@ -31,11 +32,20 @@ class QueryProductDataset(Dataset):
         # Return as a tuple with 'texts' key for CrossEncoder compatibility
         return sample.texts, sample.label
 
+puncts = string.punctuation
+def preprocess_text(text):
+    """
+    Removes punctuation from the input text and lowercases all remaining string.
+    :param text: Input string.
+    :return: String without punctuation and lowercased.
+    """
+    return ''.join([char for char in str(text).lower() if char not in puncts])
+
 def prepare_data(dataset):
     samples = []
     for _, row in dataset.iterrows():
-        query = row["query"]
-        product = row["product_title"]
+        query = preprocess_text(row["query"])
+        product = preprocess_text(row["product_title"])
         label = int(row["encoded_labels"])
         samples.append(InputExample(texts=[query, product], label=label))
     return samples
@@ -114,6 +124,10 @@ def train_crossencoder(model, dataset, num_epochs=3, learning_rate=1e-5, batch_s
 if __name__ == "__main__":
     # Load data from GitHub repo directly
     csv = '/Users/sarahlawlis/Documents/repos/self-learning-system/df_golden.csv'
+    
+    # For local testing, uncomment the line below
+    #csv = '/Users/thomasburns/Documents/Repos/esci-shopping-queries/data/df_golden_test.csv'
+    
     try:
         df = pd.read_csv(csv)
         print(f"Loaded dataset with {len(df)} records.")
@@ -134,6 +148,13 @@ if __name__ == "__main__":
 
     # Initialize dataset
     dataset = QueryProductDataset(samples)
+
+    # # Preview the first few preprocessed samples
+    # for sample in samples[:5]:
+    #     print(f"Query: {sample.texts[0]}")
+    #     print(f"Product: {sample.texts[1]}")
+    #     print(f"Label: {sample.label}")
+    #     print("---")
 
     # Initialize CrossEncoder model (for multi-class classification)
     model = CrossEncoder(
