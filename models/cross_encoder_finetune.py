@@ -1,6 +1,6 @@
 import os
 import torch
-from models.cross_encoder_train import train_crossencoder, QueryProductDataset
+from models.cross_encoder_train import train_crossencoder, QueryProductDataset,  preprocess_text
 from database.fetch_golden import fetch_golden
 from sentence_transformers import CrossEncoder, InputExample
 from safetensors.torch import load_file
@@ -46,16 +46,25 @@ def load_or_initialize_ce_model():
     model.model.to(device) 
     return model
 
+def prepare_data_finetune(df):
+    """
+    Prepares InputExample objects from a dataframe with 'query', 'product', and 'esciID' columns.
+    Applies preprocessing to both query and product strings.
+    """
+    samples = []
+    for _, row in df.iterrows():
+        query = preprocess_text(row["query"])
+        product = preprocess_text(row["product"])
+        label = int(row["esciID"])
+        samples.append(InputExample(texts=[query, product], label=label))
+    return samples
+
 def finetune_crossencoder(df_golden):
     if df_golden is None or df_golden.empty:
         print("No data provided for fine-tuning. Exiting.")
         return None
 
-    queries = df_golden['query'].tolist()
-    products = df_golden['product'].tolist()
-    labels = df_golden['esciID'].tolist()
-
-    samples = [InputExample(texts=[query, product], label=label) for query, product, label in zip(queries, products, labels)]
+    samples = prepare_data_finetune(df_golden)
     dataset = QueryProductDataset(samples)
 
     model = load_or_initialize_ce_model()

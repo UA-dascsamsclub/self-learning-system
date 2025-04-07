@@ -4,6 +4,8 @@ from torch.utils.data import DataLoader
 from sklearn.preprocessing import LabelEncoder
 from models.bi_encoder import BiEncoderWithClassifier, BiEncoderConfig
 from models.bi_encoder_train import train_biencoder, QueryProductDataset
+from models.cross_encoder_train import preprocess_text
+from sentence_transformers import InputExample
 from database.fetch_golden import fetch_golden
 
 # Configuration
@@ -32,19 +34,28 @@ def load_or_initialize_be_model():
         model.load_state_dict(torch.load(pretrained_model_path, map_location=device))
     return model
 
+
+
 def finetune_biencoder(df_golden):
     if df_golden is None or df_golden.empty:
         print("No data provided for fine-tuning. Exiting.")
         return None
 
+    # Preprocess the data
     queries = df_golden['query'].tolist()
+    queries = [preprocess_text(q) for q in queries]
     products = df_golden['product'].tolist()
+    products = [preprocess_text(p) for p in products]
     labels = df_golden['esciID'].tolist()
+
+    # Print sample data to verify preprocessing
+    #print(f"Queries: {queries[:5]}")
+    #print(f"Products: {products[:5]}")
 
     label_encoder = LabelEncoder()
     labels = torch.tensor(label_encoder.fit_transform(labels), dtype=torch.long)
 
-    dataset = QueryProductDataset(queries, products, labels)
+    dataset = QueryProductDataset(queries, products, labels)    
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
     model = load_or_initialize_be_model()

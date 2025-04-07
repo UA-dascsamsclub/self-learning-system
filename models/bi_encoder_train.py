@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
 from sentence_transformers import SentenceTransformer, util
+from models.cross_encoder_train import preprocess_text
 from models.bi_encoder import BiEncoderWithClassifier, BiEncoderConfig
 from transformers import AutoTokenizer
 from tqdm import tqdm
@@ -102,7 +103,10 @@ if __name__ == "__main__":
     
     # Load data from GitHub repo directly
     csv = '/Users/sarahlawlis/Documents/repos/self-learning-system/df_golden.csv'
-
+    
+    # For local testing
+    #csv = '/Users/thomasburns/Documents/Repos/esci-shopping-queries/data/df_golden_test.csv'
+    
     try:
         df = pd.read_csv(csv)
         print(df.columns)
@@ -113,10 +117,18 @@ if __name__ == "__main__":
 
     # Extract queries, products, and labels
     queries = df["query"].tolist()
+    queries = [preprocess_text(q) for q in queries]
     products = df["product_title"].tolist()
+    products = [preprocess_text(p) for p in products]
+
+    # Encode labels
     esci_mapping = {"E": 0, "S": 1, "C": 2, "I": 3}
     df["encoded_labels"] = df["esci_label"].map(esci_mapping)
     labels = torch.tensor(df["encoded_labels"].tolist(), dtype=torch.long)
+
+    # Print sample data to verify preprocessing
+    #print(f"Queries: {queries[:5]}")
+    #print(f"Products: {products[:5]}")
 
     sample_input = torch.rand(1, 128).to("mps")
     print(sample_input.device)
