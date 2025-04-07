@@ -150,7 +150,6 @@ if __name__ == "__main__":
     dataset = QueryProductDataset(samples)
 
     # # Preview the first few preprocessed samples
-    # print("\n🔍 Preview of preprocessed samples:")
     # for sample in samples[:5]:
     #     print(f"Query: {sample.texts[0]}")
     #     print(f"Product: {sample.texts[1]}")
