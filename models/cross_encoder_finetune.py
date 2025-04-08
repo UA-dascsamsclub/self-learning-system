@@ -53,8 +53,8 @@ def prepare_data_finetune(df):
     """
     samples = []
     for _, row in df.iterrows():
-        query = preprocess_text(row["query"])
-        product = preprocess_text(row["product"])
+        query = row["query"]
+        product = row["product"]
         label = int(row["esciID"])
         samples.append(InputExample(texts=[query, product], label=label))
     return samples

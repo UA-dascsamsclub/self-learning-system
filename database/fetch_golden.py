@@ -1,5 +1,6 @@
 import psycopg2
 import pandas as pd
+from database.fetch_data import preprocess_text
 from database.db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
 def connect_to_db():
@@ -24,6 +25,9 @@ def fetch_golden(limit=1000):
         conn = connect_to_db()
         df = pd.read_sql(query, conn)
         conn.close()
+        # Preprocess the DataFrame
+        df['query'] = df['query'].apply(preprocess_text)
+        df['product'] = df['product'].apply(preprocess_text)
         return df
     except Exception as e:
         print(f"Error fetching data: {e}")
@@ -32,4 +36,4 @@ def fetch_golden(limit=1000):
 if __name__ == "__main__":
     df = fetch_golden()
     if df is not None:
-        print(len(df))
+        print(df.head())
