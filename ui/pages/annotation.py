@@ -89,10 +89,10 @@ def show_annotation_page():
             with col1:
                 if st.button("Push Annotations to Database", key='push_annotations', use_container_width=True):
                     annotated_df = pd.DataFrame(st.session_state.annotations)
-                    st.write("Annotations DataFrame before inserting into DB:")
-                    st.dataframe(annotated_df)
+                    #st.write("Annotations DataFrame before inserting into DB:")
+                    # st.dataframe(annotated_df)
                     push_annotations_to_database(annotated_df)
-                    st.success("Annotations successfully pushed to database!")
+                    # st.success("Annotations successfully pushed to database!")
 
             with col2:
                 if st.button("Fetch More Data"):
@@ -181,23 +181,6 @@ def push_annotations_to_database(annotations_df):
                 (row["query"], row["product_title"], row["annotated_label"])
                 for _, row in annotations_df.iterrows()
             ]
-
-            # temporary table for bulk insert
-            # with conn.cursor() as tmp_cur:
-            #     tmp_cur.execute("""
-            #     CREATE TEMP TABLE tmp_import (
-            #         "query" TEXT, 
-            #         "product_title" TEXT, 
-            #         "esci_label" TEXT
-            #     ) ON COMMIT DROP;
-            #     """)
-                
-            #     psycopg2.extras.execute_values(
-            #         tmp_cur,
-            #         """INSERT INTO tmp_import ("query", "product_title", "esci_label") 
-            #            VALUES %s""",
-            #         annotations_tuples
-            #     )
 
             with conn.cursor() as tmp_cur:
                 tmp_cur.execute("""
