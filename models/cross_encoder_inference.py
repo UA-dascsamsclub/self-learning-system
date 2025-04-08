@@ -6,6 +6,7 @@ import sys
 sys.path.append('../self-learning-system')
 from database.fetch_data import fetch_query_product_pairs
 import torch.mps
+from database.store_predictions import store_predictions_in_db
 torch.mps.empty_cache()
 import datetime
 print("MPS Available:", torch.backends.mps.is_available())
@@ -68,13 +69,13 @@ def predict_labels(df, model):
     return result_df
 
 if __name__ == "__main__":
-    from database.fetch_data import fetch_query_product_pairs
-
     model_path = "models/model_ce_trained/"
     df = fetch_query_product_pairs(limit=1000)
 
     predictions_df = predict_labels(df, model=model_path)
     print("Predictions DataFrame:")
     print(predictions_df.head())
+
+    store_predictions_in_db(df=predictions_df, model_type='crossencoder')
 
 

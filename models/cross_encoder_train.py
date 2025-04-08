@@ -166,4 +166,4 @@ if __name__ == "__main__":
     model.model.to(device)
 
     # Train the model
-    train_crossencoder(model, dataset)
+    train_crossencoder(model, dataset, num_epochs=3, learning_rate=1e-5, batch_size=16, save_path="models/model_ce_trained/", fine_tune=False)

@@ -46,8 +46,8 @@ if __name__ == "__main__":
 
     connect_to_db()
     # Load the model
-    model_path = "models/model_ce_finetuned/"
-    model_id = 4
+    model_path = "models/model_ce_trained/"
+    model_id = 2
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     
     # Fetch holdout data

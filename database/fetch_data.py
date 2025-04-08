@@ -21,6 +21,7 @@ def fetch_query_product_pairs(limit=1000):
     FROM tbl_predictions
     WHERE "qpID" = qp."qpID"
     )
+    ORDER BY RANDOM()
     LIMIT {limit}
     """
 
@@ -34,7 +35,7 @@ def fetch_query_product_pairs(limit=1000):
         print(f"Error fetching data: {e}")
         return None
     
-# if __name__ == "__main__":
-#     df = fetch_query_product_pairs()
-#     if df is not None:
-#         print(df.head())
+if __name__ == "__main__":
+    df = fetch_query_product_pairs()
+    if df is not None:
+        print(df.head())

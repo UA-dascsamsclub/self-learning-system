@@ -49,7 +49,7 @@ def preprocess(queries, products, max_length=128):
     )
     return inputs["input_ids"], inputs["attention_mask"], inputs.get("token_type_ids")
 
-def train_biencoder(model, dataloader, num_epochs=3, learning_rate=1e-4, save_path="models/model_be_finetuned/", fine_tune=False):
+def train_biencoder(model, dataloader, num_epochs=3, learning_rate=1e-4, save_path="models/model_be/", fine_tune=False):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -148,4 +148,4 @@ if __name__ == "__main__":
     print(f"Using device: {device}")
 
     # Train the model
-    train_biencoder(model, dataloader)
+    train_biencoder(model, dataloader, num_epochs=3, learning_rate=1e-4, save_path="models/model_be/", fine_tune=False)
