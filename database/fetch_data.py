@@ -1,5 +1,6 @@
 import psycopg2
 import pandas as pd
+import string
 from database.db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
 def connect_to_db():
@@ -11,6 +12,15 @@ def connect_to_db():
         host=DB_HOST,
         port=DB_PORT
     )
+
+puncts = string.punctuation
+def preprocess_text(text):
+    """
+    Removes punctuation from the input text and lowercases all remaining string.
+    :param text: Input string.
+    :return: String without punctuation and lowercased.
+    """
+    return ''.join([char for char in str(text).lower() if char not in puncts])
 
 def fetch_query_product_pairs(limit=1000):
     query = f"""
@@ -29,6 +39,9 @@ def fetch_query_product_pairs(limit=1000):
         conn = connect_to_db()
         df = pd.read_sql(query, conn)
         conn.close()
+        # Preprocess the DataFrame
+        df['query'] = df['query'].apply(preprocess_text)
+        df['product'] = df['product'].apply(preprocess_text)
         return df
     
     except Exception as e:

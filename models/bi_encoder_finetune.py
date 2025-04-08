@@ -43,14 +43,8 @@ def finetune_biencoder(df_golden):
 
     # Preprocess the data
     queries = df_golden['query'].tolist()
-    queries = [preprocess_text(q) for q in queries]
     products = df_golden['product'].tolist()
-    products = [preprocess_text(p) for p in products]
     labels = df_golden['esciID'].tolist()
-
-    # Print sample data to verify preprocessing
-    #print(f"Queries: {queries[:5]}")
-    #print(f"Products: {products[:5]}")
 
     label_encoder = LabelEncoder()
     labels = torch.tensor(label_encoder.fit_transform(labels), dtype=torch.long)

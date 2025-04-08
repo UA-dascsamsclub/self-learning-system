@@ -1,5 +1,6 @@
 import psycopg2
 import pandas as pd
+from database.fetch_data import preprocess_text
 from database.db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
 def connect_to_db():
@@ -23,6 +24,9 @@ def fetch_holdout(limit=100000):
         conn = connect_to_db()
         df = pd.read_sql(query, conn)
         conn.close()
+        # Preprocess the DataFrame
+        df['query'] = df['query'].apply(preprocess_text)
+        df['product'] = df['product'].apply(preprocess_text)
         return df
     except Exception as e:
         print(f"Error fetching data: {e}")
