@@ -1,6 +1,6 @@
 import os
 import torch.nn as nn
-import torch.optim as optim
+from torch.optim import AdamW
 from torch.utils.data import DataLoader, Dataset
 from sentence_transformers import SentenceTransformer, util
 from models.cross_encoder_train import preprocess_text
@@ -49,9 +49,9 @@ def preprocess(queries, products, max_length=128):
     )
     return inputs["input_ids"], inputs["attention_mask"], inputs.get("token_type_ids")
 
-def train_biencoder(model, dataloader, num_epochs=3, learning_rate=1e-4, save_path="models/model_be/", fine_tune=False):
+def train_biencoder(model, dataloader, num_epochs=3, learning_rate=1e-5, save_path="models/model_be/", fine_tune=False):
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = AdamW(model.parameters(), lr=learning_rate)
 
     if not os.path.exists(save_path):
         os.makedirs(save_path)
