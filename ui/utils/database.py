@@ -6,6 +6,14 @@ from psycopg2 import extras
 import psycopg2.extras
 
 def init_connection():
+    """
+    Initializes a connection to the PostgreSQL database if not already established.
+
+    The connection parameters (host, database, user, password) are fetched from Streamlit secrets.
+
+    Returns:
+        conn: A psycopg2 database connection object if successful, otherwise None.
+    """
     if 'conn' not in st.session_state:
         try:
             st.session_state.conn = psycopg2.connect(
@@ -32,6 +40,16 @@ def run_query(query, params=None):
     return None
 
 def execute_query(query, params):
+    """
+    Executes a SQL query and returns the result as a Pandas DataFrame.
+
+    Parameters:
+        query (str): The SQL query string to be executed.
+        params (tuple, optional): The parameters to be passed with the query (default is None).
+
+    Returns:
+        pd.DataFrame: The result of the query as a DataFrame if successful, otherwise None.
+    """
     conn = init_connection()  
     if conn:
         try:
@@ -45,11 +63,31 @@ def execute_query(query, params):
 
 # Verify password using bcrypt
 def verify_password(stored_password, provided_password):
+    """
+    Verifies if the provided password matches the stored (hashed) password using bcrypt.
+
+    Parameters:
+        stored_password (str): The stored hashed password in the database.
+        provided_password (str): The password provided by the user during login.
+
+    Returns:
+        bool: True if the passwords match, False otherwise.
+    """
     conn = init_connection()
     return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
 
 # Login function
 def authenticate_user(username, password):
+    """
+    Authenticates a user by checking the provided username and password against the database.
+
+    Parameters:
+        username (str): The username provided by the user during login.
+        password (str): The password provided by the user during login.
+
+    Returns:
+        bool: True if the user is authenticated, False otherwise.
+    """
     conn = init_connection()
     cur = conn.cursor()
     try:

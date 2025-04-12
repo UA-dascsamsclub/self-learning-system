@@ -40,6 +40,10 @@ def preprocess(queries, products, max_length=128):
     """
     Tokenizes and prepares input tensors for the bi-encoder model.
     Ensures queries and products are lists of strings.
+    :param queries: List of query strings.
+    :param products: List of product strings.
+    :param max_length: Maximum length for truncating or padding the sequences.
+    :return: Tuple containing input_ids, attention_mask, and token_type_ids.
     """
     queries = [str(q) for q in queries]
     products = [str(p) for p in products]
@@ -50,6 +54,16 @@ def preprocess(queries, products, max_length=128):
     return inputs["input_ids"], inputs["attention_mask"], inputs.get("token_type_ids")
 
 def train_biencoder(model, dataloader, num_epochs=3, learning_rate=1e-5, save_path="models/model_be/", fine_tune=False):
+    """
+    Trains the Bi-Encoder model for query-product classification.
+    :param model: The Bi-Encoder model.
+    :param dataloader: Dataloader providing batches of query-product pairs.
+    :param num_epochs: Number of epochs to train the model.
+    :param learning_rate: Learning rate for the optimizer.
+    :param save_path: Path to save the trained model and tokenizer.
+    :param fine_tune: Whether to freeze early layers for fine-tuning.
+    """
+    
     criterion = nn.CrossEntropyLoss()
     optimizer = AdamW(model.parameters(), lr=learning_rate)
 

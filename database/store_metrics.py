@@ -4,7 +4,10 @@ from database.store_predictions import get_latest_model_id
 import pandas as pd
 
 def connect_to_db():
-    """Establishes a connection to the PostgreSQL database."""
+    """Establishes a connection to the PostgreSQL database.
+    
+    :return: psycopg2 connection object.
+    """
     return psycopg2.connect(
         dbname=DB_NAME,
         user=DB_USER,
@@ -14,7 +17,14 @@ def connect_to_db():
     )
 
 def store_model_metrics(model_id, df):
-    """Stores accuracy metrics from df in tbl_accuracy and links them to the latest model in tbl_model_accuracy."""
+    """
+    Stores accuracy metrics from the given DataFrame into tbl_accuracy,
+    and creates a mapping between the model and its metrics in tbl_modelaccuracy.
+
+    :param model_id: ID of the model to associate the metrics with.
+    :param df: DataFrame containing 'precision', 'recall', and 'microf1' columns.
+    :return: None
+    """    
     with connect_to_db() as conn:
         with conn.cursor() as cur:
             
@@ -52,5 +62,6 @@ if __name__ == "__main__":
     }
     df = pd.DataFrame(df)
 
-    store_model_metrics("crossencoder", df)
-    store_model_metrics("biencoder", df)
+    # Storing metrics for both crossencoder and biencoder (IDs must be valid integers, not strings)
+    store_model_metrics(2, df)
+    store_model_metrics(1, df)

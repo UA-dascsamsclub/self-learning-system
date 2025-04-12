@@ -3,6 +3,21 @@ import psycopg2
 import psycopg2.extras
 
 def add_users_to_database():
+    """
+    Adds multiple users to the database by hashing their passwords and 
+    inserting their username and hashed password into the `tbl_analyst` table.
+
+    Steps:
+    1. Connect to the database using psycopg2.
+    2. Iterate through a list of users (username, password) tuples.
+    3. For each user:
+       - Hash the password using bcrypt.
+       - Insert the username and hashed password into the database.
+    4. Commit the changes if all insertions are successful.
+    5. If an error occurs, rollback the transaction to avoid partial inserts.
+    6. Close the cursor and database connection at the end.
+
+    """
     # Connect to your database
     conn = psycopg2.connect(
         host="insert host here",

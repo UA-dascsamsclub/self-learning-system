@@ -4,7 +4,9 @@ import string
 from database.db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
 def connect_to_db():
-    """Establishes a connection to the PostgreSQL database."""
+    """Establishes a connection to the PostgreSQL database.
+    
+    :return: psycopg2 connection object."""
     return psycopg2.connect(
         dbname=DB_NAME, 
         user=DB_USER, 
@@ -23,6 +25,14 @@ def preprocess_text(text):
     return ''.join([char for char in str(text).lower() if char not in puncts])
 
 def fetch_query_product_pairs(limit=1000):
+    """
+    Fetches query-product pairs from the database that have not yet been used in predictions.
+    Applies preprocessing to both query and product text fields.
+    
+    :param limit: Maximum number of rows to fetch. Defaults to 1000.
+    :return: DataFrame containing preprocessed query-product pairs, or None if an error occurs.
+    """
+    
     query = f"""
     SELECT query, product
     FROM tbl_queryproducts qp
@@ -49,6 +59,7 @@ def fetch_query_product_pairs(limit=1000):
         return None
     
 if __name__ == "__main__":
+    # Run data fetching when script is executed directly
     df = fetch_query_product_pairs()
     if df is not None:
         print(df.head())

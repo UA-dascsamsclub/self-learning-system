@@ -2,6 +2,16 @@ import streamlit as st
 from utils.database import authenticate_user, init_connection
 
 def show_login_page():
+    """
+    Displays the login page for users to authenticate themselves before annotating data.
+
+    Steps:
+    1. Initializes a connection to the database using the `init_connection` function.
+    2. Displays the login form with fields for username and password.
+    3. Verifies the login credentials by calling the `authenticate_user` function.
+    4. If authentication is successful, sets session state values and redirects to the annotation page.
+    5. If authentication fails or fields are left empty, appropriate error or warning messages are displayed.
+    """
     conn = init_connection()
 
     if conn is None:
