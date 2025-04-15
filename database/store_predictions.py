@@ -1,6 +1,7 @@
 import psycopg2
 import pandas as pd
 from database.db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+from database.fetch_data import preprocess_text
 
 def connect_to_db():
     """Establishes a connection to the PostgreSQL database."""
@@ -17,6 +18,8 @@ def fetch_qp_ids(df):
     with connect_to_db() as conn:
         query = """SELECT "qpID", query, product FROM tbl_queryproducts"""
         qp_df = pd.read_sql(query, conn)
+        qp_df['query'] = df['query'].apply(preprocess_text)
+        qp_df['product'] = df['product'].apply(preprocess_text)
         return df.merge(qp_df, on=['query', 'product'], how='left')
     
 def fetch_esci_ids(df):
@@ -76,8 +79,9 @@ def store_predictions_in_db(df, model_type):
             print(f"Error: No model found for {model_type}. Exiting prediction storage.")
             return
 
-        df = fetch_qp_ids(df)
-        print(f"DEBUG: Retrieved {df['qpID'].notnull().sum()} qpIDs from {len(df)} rows.")
+        if 'qpID' not in df.columns:
+            print("ERROR: qpID column missing in input DataFrame. Ensure fetch_data.py includes qpID.")
+            return
 
         df = fetch_esci_ids(df)
         print(f"DEBUG: Retrieved {df['esciID'].notnull().sum()} esciIDs from {len(df)} rows.")
@@ -90,8 +94,8 @@ def store_predictions_in_db(df, model_type):
             insert_query = """
             INSERT INTO tbl_predictions ("qpID", "esciID", "modelID", "confidenceScore")
             VALUES (%s, %s, %s, %s)
-            ON CONFLICT ("qpID", "modelID") DO UPDATE
-            SET "esciID" = EXCLUDED."esciID", "confidenceScore" = EXCLUDED."confidenceScore"
+            ON CONFLICT ("qpID") DO UPDATE
+            SET "esciID" = EXCLUDED."esciID", "confidenceScore" = EXCLUDED."confidenceScore", "modelID" = EXCLUDED."modelID"
             """
 
             data_to_insert = [

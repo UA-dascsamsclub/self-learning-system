@@ -53,15 +53,28 @@ def predict_labels(df, model):
 
         max_scores, predicted_classes = torch.max(probs, dim=1)
 
-        for (query, product), label, score in zip(batch, predicted_classes.tolist(), max_scores.tolist()):
+        qpid_batch = df['qpID'][i:i + batch_size].tolist()
+
+        for (query, product), label, score, qpID in zip(batch, predicted_classes.tolist(), max_scores.tolist(), qpid_batch):
             results.append({
+                "qpID": qpID,
                 "query": query,
                 "product": product,
                 "score": score,
                 "esci_label": label
             })
 
-    result_df = pd.DataFrame(results, columns=["query", "product", "score", "esci_label"])
+    result_df = pd.DataFrame(results, columns=["qpID", "query", "product", "score", "esci_label"])
+
+    #     for (query, product), label, score in zip(batch, predicted_classes.tolist(), max_scores.tolist()):
+    #         results.append({
+    #             "query": query,
+    #             "product": product,
+    #             "score": score,
+    #             "esci_label": label
+    #         })
+
+    # result_df = pd.DataFrame(results, columns=["query", "product", "score", "esci_label"])
     num_nans = result_df["esci_label"].isna().sum()
     if num_nans > 0:
         print(f"Warning: Dropping {num_nans} rows with NaN predictions.")
