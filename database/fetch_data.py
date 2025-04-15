@@ -34,7 +34,7 @@ def fetch_query_product_pairs(limit=1000):
     """
     
     query = f"""
-    SELECT query, product
+    SELECT "qpID", query, product
     FROM tbl_queryproducts qp
     WHERE NOT EXISTS (
     SELECT
@@ -49,7 +49,6 @@ def fetch_query_product_pairs(limit=1000):
         conn = connect_to_db()
         df = pd.read_sql(query, conn)
         conn.close()
-        # Preprocess the DataFrame
         df['query'] = df['query'].apply(preprocess_text)
         df['product'] = df['product'].apply(preprocess_text)
         return df
