@@ -4,7 +4,9 @@ from database.fetch_data import preprocess_text
 from database.db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
 def connect_to_db():
-    """Establishes a connection to the PostgreSQL database."""
+    """Establishes a connection to the PostgreSQL database.
+    
+    :return: psycopg2 connection object."""
     return psycopg2.connect(
         dbname=DB_NAME, 
         user=DB_USER, 
@@ -14,6 +16,14 @@ def connect_to_db():
     )
 
 def fetch_golden(limit=1000):
+    """
+    Fetches the most recent golden labeled query-product pairs along with their ESCI labels.
+    Applies preprocessing to both query and product text fields.
+    
+    :param limit: Parameter to limit row returned. Defaults to 1000.
+    :return: DataFrame containing preprocessed query, product, and esciID columns, or None if an error occurs.
+    """
+
     query = f"""
     SELECT qp.query, qp.product, g."esciID"
     FROM tbl_golden g
@@ -34,6 +44,7 @@ def fetch_golden(limit=1000):
         return None
     
 if __name__ == "__main__":
+    # Run data fetching when script is executed directly
     df = fetch_golden()
     if df is not None:
         print(df.head())

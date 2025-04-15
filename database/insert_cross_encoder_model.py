@@ -3,7 +3,10 @@ import datetime
 from database.db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
 def connect_to_db():
-    """Establishes a connection to the PostgreSQL database."""
+    """Establishes a connection to the PostgreSQL database.
+    
+    :return: psycopg2 connection object.
+    """
     return psycopg2.connect(
         dbname=DB_NAME,
         user=DB_USER,
@@ -13,7 +16,14 @@ def connect_to_db():
     )
 
 def insert_base_crossencoder_model():
-    """Inserts a single base crossencoder model into tbl_models if it does not exist."""
+    """
+    Inserts a base crossencoder model entry into the database if one does not already exist.
+    This function checks for an existing model with the class 'crossencoder' in tbl_models.
+    If none is found, it inserts a new entry into tbl_versionmodel with the current timestamp,
+    then inserts the new model into tbl_models using the retrieved version and corresponding model class ID.
+    
+    :return: None
+    """
     print("Connecting to database...")  # Debugging print
     with connect_to_db() as conn:
         with conn.cursor() as cur:

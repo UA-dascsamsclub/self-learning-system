@@ -9,6 +9,10 @@ from utils.session import reset_session_variables
 
 
 def show_annotation_page():
+    """
+    Displays the annotation page for label annotation. Allows the user to annotate data
+    with the appropriate label, save the annotations, and push them to the database.
+    """
     st.title(f"Label Annotation")
 
     if 'show_label_info' not in st.session_state:
@@ -150,6 +154,14 @@ def show_annotation_page():
         st.markdown(label_data.to_html(escape=False, index=False), unsafe_allow_html=True)
 
 def push_annotations_to_database(annotations_df):
+    """
+    Pushes the annotated labels to the database.
+    It inserts annotations into the appropriate tables, including golden versions,
+    model predictions, and analyst data.
+
+    Args:
+    annotations_df (pd.DataFrame): The dataframe containing the annotations to be inserted.
+    """
     # get the username and current timestamp
     user_id = st.session_state.username
     current_timestamp = time.strftime('%Y-%m-%d %H:%M:%S')  
@@ -239,6 +251,13 @@ def push_annotations_to_database(annotations_df):
         conn.rollback()
 
 def save_annotation(row, label):
+    """
+    Saves the annotation made by the user to the session state.
+
+    Args:
+    row (pd.Series): The row containing query and product information.
+    label (str): The label assigned to the product by the user.
+    """
     esci_mapping = {0: 'E', 1: 'S', 2: 'C', 3: 'I'}
     new_annotation = {
         'query': row['query'],

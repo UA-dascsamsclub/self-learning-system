@@ -20,6 +20,9 @@ os.makedirs("models/model_ce_finetuned", exist_ok=True)
 def load_or_initialize_ce_model():
     """
     Load the finetuned model if it exists, otherwise load the pretrained model.
+    - Checks if a finetuned model exists in the specified directory.
+    - If available, loads the finetuned model and its weights.
+    - If not available, loads the pretrained model and its weights.
     """
     print(f"Pretrained model path: {pretrained_model_path}")
     print(f"Finetuned model path: {finetuned_model_path}")
@@ -48,8 +51,12 @@ def load_or_initialize_ce_model():
 
 def prepare_data_finetune(df):
     """
-    Prepares InputExample objects from a dataframe with 'query', 'product', and 'esciID' columns.
-    Applies preprocessing to both query and product strings.
+    Prepares InputExample objects from a dataframe for fine-tuning the CrossEncoder.
+    Converts 'query', 'product', and 'esciID' columns into an InputExample format.
+    - Preprocesses the query and product strings.
+    - Creates a list of InputExample objects with labels for fine-tuning.
+    :param df: DataFrame containing 'query', 'product', and 'esciID' columns.
+    :return: A list of InputExample objects.
     """
     samples = []
     for _, row in df.iterrows():
@@ -60,6 +67,14 @@ def prepare_data_finetune(df):
     return samples
 
 def finetune_crossencoder(df_golden):
+    """
+    Fine-tunes the CrossEncoder model using the provided golden data.
+    - Loads the golden data using fetch_golden().
+    - Prepares the data for fine-tuning by creating InputExample objects.
+    - Initializes and fine-tunes the model.
+    :param df_golden: DataFrame containing the golden data for fine-tuning.
+    :return: Model name and path after fine-tuning.
+    """
     if df_golden is None or df_golden.empty:
         print("No data provided for fine-tuning. Exiting.")
         return None

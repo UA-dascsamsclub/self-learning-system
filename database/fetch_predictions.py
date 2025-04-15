@@ -3,7 +3,10 @@ import pandas as pd
 from database.db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
 def connect_to_db():
-    """Establishes a connection to the PostgreSQL database."""
+    """Establishes a connection to the PostgreSQL database.
+    
+    :return: psycopg2 connection object.
+    """
     return psycopg2.connect(
         dbname=DB_NAME, 
         user=DB_USER, 
@@ -13,6 +16,13 @@ def connect_to_db():
     )
 
 def fetch_predictions(limit=1000):
+    """
+    Fetches predicted query-product pairs and their associated ESCI labels from the database.
+    
+    :param limit: Maximum number of rows to fetch. Defaults to 1,000.
+    :return: DataFrame containing query, product, and esciID columns, or None if an error occurs.
+    """
+
     query = f"""
     SELECT qp.query, qp.product, p."esciID"
     FROM tbl_predictions p
@@ -30,6 +40,7 @@ def fetch_predictions(limit=1000):
         return None
     
 if __name__ == "__main__":
+    # Run data fetching when script is executed directly
     df = fetch_predictions()
     if df is not None:
         print(df.head())

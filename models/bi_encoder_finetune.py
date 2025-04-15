@@ -23,6 +23,8 @@ os.makedirs("models/model_be_finetuned", exist_ok=True)
 def load_or_initialize_be_model():
     """
     Load the finetuned model if it exists, otherwise load the pretrained model.
+    
+    :return: BiEncoderWithClassifier model instance on the correct device
     """
     if os.path.exists(finetuned_model_path):
         print(f"Loading finetuned model from {finetuned_model_path}")
@@ -37,6 +39,12 @@ def load_or_initialize_be_model():
 
 
 def finetune_biencoder(df_golden):
+    """
+    Fine-tunes the bi-encoder model on labeled golden data.
+
+    :param df_golden: DataFrame containing 'query', 'product', and 'esciID'
+    :return: Tuple of model class string and path to the fine-tuned model
+    """
     if df_golden is None or df_golden.empty:
         print("No data provided for fine-tuning. Exiting.")
         return None

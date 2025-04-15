@@ -20,10 +20,22 @@ from models.cross_encoder_accuracy import calculate_ce_metrics
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), "../config/pipeline.yaml")
 
 def load_config(config_path=CONFIG_PATH):
+    """
+    Load the configuration from the YAML file.
+    
+    :param config_path: Path to the configuration YAML file.
+    :return: Loaded configuration as a dictionary.
+    """
     with open(config_path, 'r') as file:
         return yaml.safe_load(file)
     
 def setup_logging(log_config, base_dir):
+    """
+    Setup logging configuration.
+    
+    :param log_config: Dictionary containing log configuration (log level, file path).
+    :param base_dir: The base directory where log files will be saved.
+    """
     log_file = os.path.join(base_dir, log_config['log_file'])
     log_dir = os.path.dirname(log_file)
 
@@ -41,6 +53,15 @@ def setup_logging(log_config, base_dir):
     logging.info("Logging initialized.")
 
 def main():
+    """
+    Main function that runs the entire pipeline.
+    
+    - Loads configuration
+    - Fetches labeled data for fine-tuning
+    - Fine-tunes both Bi-Encoder and Cross-Encoder models
+    - Evaluates and stores model metrics
+    - Performs inference and stores predictions in the database
+    """
     config = load_config()
     base_dir = os.path.abspath(config['pipeline']['base_dir'])  # Get absolute path
 

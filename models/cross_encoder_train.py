@@ -18,7 +18,9 @@ print(f"Using device: {device}")
 class QueryProductDataset(Dataset):
     def __init__(self, samples):
         """
-        Initializes the dataset with query-product pairs and corresponding labels.
+        Custom Dataset class for handling query-product pairs and their corresponding labels.
+        This class works with PyTorch DataLoader.
+        
         :param samples: List of InputExample objects.
         """
         self.samples = samples
@@ -42,6 +44,13 @@ def preprocess_text(text):
     return ''.join([char for char in str(text).lower() if char not in puncts])
 
 def prepare_data(dataset):
+    """
+    Prepares the dataset for training by processing 'query', 'product_title', and 'encoded_labels' columns.
+    Converts them into InputExample objects for the CrossEncoder model.
+    
+    :param dataset: DataFrame containing the data.
+    :return: List of InputExample objects.
+    """
     samples = []
     for _, row in dataset.iterrows():
         query = preprocess_text(row["query"])
@@ -51,7 +60,12 @@ def prepare_data(dataset):
     return samples
 
 def collate_fn(batch):
-    # Convert batch to a list of InputExample objects
+    """
+    Custom collate function for handling the batch data in DataLoader.
+    
+    :param batch: List of tuples containing query, product, and label.
+    :return: List of InputExample objects.
+    """
     input_examples = []
     for item in batch:
         query, product, label = item[0][0], item[0][1], item[1]  # Unpacking the tuple correctly
@@ -61,6 +75,17 @@ def collate_fn(batch):
     return input_examples
 
 def train_crossencoder(model, dataset, num_epochs=3, learning_rate=1e-5, batch_size=16, save_path="models/model_ce_trained/", fine_tune=False):
+    """
+    Function to train the CrossEncoder model. It handles fine-tuning, optimizer setup, and model saving.
+    
+    :param model: The CrossEncoder model to be trained.
+    :param dataset: The dataset used for training.
+    :param num_epochs: Number of training epochs.
+    :param learning_rate: Learning rate for the optimizer.
+    :param batch_size: Batch size for training.
+    :param save_path: Directory to save the trained model.
+    :param fine_tune: Flag indicating whether to freeze early layers during fine-tuning.
+    """
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
